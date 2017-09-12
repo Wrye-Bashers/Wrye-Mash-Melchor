@@ -31,7 +31,6 @@ from types import *
 import bolt
 from bolt import LString,GPath, SubProgress
 
-#--wxPython
 import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.evtmgr import eventManager
@@ -824,6 +823,19 @@ class List(wx.Panel):
 				selected.append(self.items[itemDex])
 		return selected
 
+	#$# from FallenWizard
+	def DeleteSelected(self):
+		"""Deletes selected items."""
+		items = self.GetSelected()
+		if items:
+			message = _(r'Delete these items? This operation cannot be undone.')
+			message += '\n* ' + '\n* '.join(x for x in sorted(items))
+			if balt.askYes(self,message,_('Delete Items')):
+				for item in items:
+					self.data.delete(item)
+			modList.Refresh()
+	#$#
+
 	def GetSortSettings(self,col,reverse):
 		"""Return parsed col, reverse arguments. Used by SortSettings.
 		col: sort variable. 
@@ -1315,6 +1327,9 @@ class ModList(List):
 		#--Events
 		wx.EVT_LIST_ITEM_SELECTED(self,self.listId,self.OnItemSelected)
 		self.list.Bind(wx.EVT_LEFT_DCLICK, self.OnDoubleClick)
+		#$# from FallenWizard
+		self.list.Bind(wx.EVT_CHAR, self.OnChar)
+		#$#
 
 	def Refresh(self,files='ALL',detail='SAME'):
 		"""Refreshes UI for specified file. Also calls saveList.Refresh()!"""
@@ -1438,6 +1453,13 @@ class ModList(List):
 			settings['mash.modDocs.show'] = True
 		docBrowser.SetMod(fileInfo.name)
 		docBrowser.Raise()
+
+	#$# from FallenWizard
+	def OnChar(self,event):
+		if (event.GetKeyCode() == 127):
+			self.DeleteSelected()
+		event.Skip()
+	#$#
 
 	#--Column Resize
 	def OnColumnResize(self,event):
@@ -1796,6 +1818,9 @@ class SaveList(List):
 		self.list.SetImageList(checkboxesIL,wx.IMAGE_LIST_SMALL)
 		#--Events
 		wx.EVT_LIST_ITEM_SELECTED(self,self.listId,self.OnItemSelected)
+		#$# from FallenWizard
+		self.list.Bind(wx.EVT_CHAR, self.OnChar)
+		#$#
 
 	def Refresh(self,files='ALL',detail='SAME'):
 		"""Refreshes UI for specified files."""
@@ -1896,6 +1921,13 @@ class SaveList(List):
 		self.details.SetFile(saveName)
 		if journalBrowser: 
 			journalBrowser.SetSave(saveName)
+
+	#$# from FallenWizard
+	def OnChar(self,event):
+		if (event.GetKeyCode() == 127):
+			self.DeleteSelected()
+		event.Skip()
+	#$#
 
 #------------------------------------------------------------------------------
 class SaveDetails(wx.Window):
@@ -2177,6 +2209,7 @@ class InstallersPanel(SashTankPanel):
 			installercons, InstallersPanel.mainMenu, InstallersPanel.itemMenu,
 			details=self, style=wx.LC_REPORT)
 		self.gList.SetSizeHints(100,100)
+		self.gList.gList.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.DoColumnMenu)
 		#--Package
 		self.gPackage = wx.TextCtrl(right,-1,style=wx.TE_READONLY|wx.NO_BORDER)
 		self.gPackage.SetBackgroundColour(self.GetBackgroundColour())
@@ -2229,6 +2262,14 @@ class InstallersPanel(SashTankPanel):
 			))
 		wx.LayoutAlgorithm().LayoutWindow(self, right)
 
+	#-# D.C.-G.
+	#-# Modified to avoid system error if installers path is not reachable.
+	def DoColumnMenu(self, event):
+		"""..."""
+		if not os.access(mosh.dirs["installers"].s, os.W_OK):
+			pass
+		self.gList.DoColumnMenu(event)
+
 	def OnShow(self):
 		"""Panel is shown. Update self.data."""
 		if settings.get('bash.installers.isFirstRun',True):
@@ -2245,8 +2286,12 @@ class InstallersPanel(SashTankPanel):
 			progress = balt.Progress(_("Refreshing Installers..."),'\n'+' '*60)
 			try:
 				what = ('DIS','I')[self.refreshed]
-				if data.refresh(progress,what,self.fullRefresh):
+				#-#
+				modified = data.refresh(progress,what,self.fullRefresh)
+				if modified == True:
 					self.gList.RefreshUI()
+				if modified == "noDir":
+					WarningMessage(self,_("'%s' cannot be accessed.\nThis path is possibly on a remote drive, or mispelled, or unwritable."%mosh.dirs["installers"].s))
 				self.fullRefresh = False
 				self.frameActivated = False
 				self.refreshing = False
@@ -2432,6 +2477,11 @@ class InstallersPanel(SashTankPanel):
 			else: 
 				espmNots.add(espm)
 		self.refreshCurrent(installer)
+
+	#-# D.C.-G.
+	def SaveCfgFile(self):
+		"""Save the installers path in mash.ini."""
+		self.data.saveCfgFile()
 
 #------------------------------------------------------------------------------
 class ScreensList(List):
@@ -3096,6 +3146,7 @@ class MashFrame(wx.Frame):
 		#-#
 		if settingsWindow:
 			settingsWindow.Destroy()
+		gInstallers.SaveCfgFile()
 		#-#
 		event.Skip()
 		settings.save()
@@ -3725,7 +3776,7 @@ class MashApp(wx.App):
 		if settings['mash.settings.show']:
 			global settingsWindow
 			settingsWindow = SettingsWindow()
-			settingsWindow.SetSettings(settings)
+			settingsWindow.SetSettings(settings, Inst=mosh.dirs["installers"].s)
 			settingsWindow.Show()
 		#-#
 		return True
@@ -5149,6 +5200,18 @@ class Installer_Move(InstallerLink):
 		self.gTank.RefreshUI()
 
 #------------------------------------------------------------------------------
+#-# D.C.-G.
+#-# Added to avoid errors when the installers path is unreachable.
+class Installers_Open(balt.Tank_Open):
+	"""Open selected file(s) from the menu."""
+	def AppendToMenu(self,menu,window,data):
+		Link.AppendToMenu(self,menu,window,data)
+		menuItem = wx.MenuItem(menu,self.id,_('Open...'))
+		menu.AppendItem(menuItem)
+		if not os.access(mosh.dirs["installers"].s, os.W_OK):
+			menuItem.Enable(False)
+			# print menuItem.Enabled
+#-#
 class Installer_Open(balt.Tank_Open):
 	"""Open selected file(s)."""
 	def AppendToMenu(self,menu,window,data):
@@ -7071,7 +7134,7 @@ class App_Settings(Link):
 		global settingsWindow
 		if not settingsWindow: 
 			settingsWindow = SettingsWindow()
-			settingsWindow.SetSettings(settings)
+			settingsWindow.SetSettings(settings, Inst=mosh.dirs["installers"].s)
 			settingsWindow.Show()
 			settings['mash.settings.show'] = True
 		settingsWindow.Raise()
@@ -7213,7 +7276,8 @@ def InitInstallerLinks():
 	#InstallersPanel.mainMenu.append(Installers_SortStructure())
 	#--Actions
 	InstallersPanel.mainMenu.append(SeparatorLink())
-	InstallersPanel.mainMenu.append(balt.Tanks_Open())
+	# InstallersPanel.mainMenu.append(balt.Tanks_Open())
+	InstallersPanel.mainMenu.append(Installers_Open())
 	InstallersPanel.mainMenu.append(Installers_Refresh(fullRefresh=False))
 	InstallersPanel.mainMenu.append(Installers_Refresh(fullRefresh=True))
 	#InstallersPanel.mainMenu.append(Mods_IniTweaks())

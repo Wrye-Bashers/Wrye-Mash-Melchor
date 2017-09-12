@@ -350,7 +350,7 @@
 		<p class=empty>&nbsp;</p>
 		<p class=list-1>&bull;&nbsp; To open the settings window, click on the green floppy disk at the bottom left of Mash window 
 		 (the rightmost icon in the leftmost part of the status bar).
-		<p class=list-1>&bull;&nbsp; The only setting available for now, is the Morrowind install directory.
+		<p class=list-1>&bull;&nbsp; Two settings available: the <b>Morrowind install directory</b> and the <b>installers directory</b>.
 		<br>Enter a new path in the text field or click the button on the right of the field to change the directory.
 		<p class=list-1>&bull;&nbsp; The changes are <u>not saved</u>, <u>unless</u> you click on the <b>'Ok'</b> button.
 		<p class=empty>&nbsp;</p>
@@ -418,7 +418,7 @@
 		<h3><p style="margin-top: 0in; margin-bottom: 0in; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: border-bottom: 1px solid #000000; border-right: border-bottom: 1px solid #000000; padding: 0.02in 0in; background: #e6e6e6;">Note</h3>
 		<p style="background-color: #FDF5E6; margin-top: 10px; margin-bottom: 10px; margin-left: 10px; margin-right: 10px; border: 1px solid; padding: 0.05in">
 		Wrye Mash will skip the installers detection if the corresponding directory is unreachable (i.e. on a network or a remote drive).
-		<br>But if you try to open or enable the installers function, you will get an error.
+		<br>In this case, the 'Open' option in the menu is disabled.
 		<p style="margin-top: 0in; margin-bottom: 0in; border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: border-bottom: 1px solid #000000; border-right: border-bottom: 1px solid #000000; padding: 0.02in 0in; background: #e6e6e6; font-size: 0">&nbsp;
 		</p>
 		<p class=empty>&nbsp;</p>
@@ -434,7 +434,7 @@
 		  <p class=list-2>&bull;&nbsp; You can disable Bain entirely by unchecking "Enabled" in the column context menu on the Installers tab. (Note that this does <B><I>not</I></B> erase previously stored info. I.e. it's safe to disable Bain and then later re-enable it if you prefer.)
 		  <p class=list-2>&bull;&nbsp; You can choose to "Avoid on Startup" (again from column context menu). This will cause Mash to try to avoid the Installers tab when it starts up. And since Bain won't initialize until you visit the Installers tab, you'll save a bit of time if you weren't planning on visiting it anyway.
 		<p class=list-1>&bull;&nbsp; <B>Install Directory</B>
-		  <p class=list-2>&bull;&nbsp; As noted below, Bain looks for packages in the <B>Morrowind\Installers</B> directory. Easiest way to get started with Bain is to just grab all your old mod archives and move them to the Installers directory. Then return to the Installers directory to see Bain's evaluation. 
+		  <p class=list-2>&bull;&nbsp; As noted below, Bain looks for packages in the <B>Morrowind\Installers</B>* directory. Easiest way to get started with Bain is to just grab all your old mod archives and move them to the Installers directory. Then return to the Installers directory to see Bain's evaluation. 
 		  <p class=list-2>&bull;&nbsp; If you're a modder with existing project directories, you can move those to the Installers directory too.
 		<p class=list-1>&bull;&nbsp; <B>Reviewing Package Status</B>
 		  <p class=list-2>&bull;&nbsp; Some packages may be green, but most (even ones that you have previously installed) will likely be red. (Even if you have installed a package, Bain's <a href="#DocFileSweeping">Doc File Sweeping</a> means that some files will be in unexpected places. 
@@ -444,7 +444,7 @@
 		  <p class=list-2>&bull;&nbsp; For packages with unrecognized structure (grey checkbox and name), you'll need to restructure the package's directories and files to something more like what Bain expects before you can install them.
 		  <p class=empty>&nbsp;</p>
 		<h3><a name='OverviewGS'>Overview</a></h3>
-		<p>Bain will search for and display packages from the (new) <B>Morrowind\Installers</B> directory. Mods (either archives or projects) can then be installed or uninstalled, and their status can be reviewed in the details pane on the right. 
+		<p>Bain will search for and display packages from the (new) <B>Morrowind\Installers</B>* directory. Mods (either archives or projects) can then be installed or uninstalled, and their status can be reviewed in the details pane on the right. 
 		<p class=list-1>&bull;&nbsp; <B>Checkmarks</B>
 		  <p class=list-2>&bull;&nbsp; Installed packages will be marked with a "+".
 		<p class=list-1>&bull;&nbsp; <B>Icon Colors</B>
@@ -581,6 +581,9 @@
 		  <p class=list-2>&bull;&nbsp; <B>Clean Data Directory:</B> If this is checked, then any empty subfolders of the Morrowind\Data Files directory will be deleted.
 		  <p class=list-2>&bull;&nbsp; <B>Show Inactive Conflicts:</B> If checked, then the conflicts report will show conflicts with inactive as well as active mods. Usually only active conflicts are of interest, however sometimes its useful to review all conflicting packages.
 		  <p class=list-2>&bull;&nbsp; <B>Show Lower Conflicts:</B> If checked, then the conflicts report with show conflicts with lower order packages. If you're only interested in higher order conflicts, the uncheck this to remove some clutter from the report.
+		  <p class=empty>&nbsp;</p>
+		  <p class=empty>&nbsp;</p>
+		  <p class=list1>&nbsp;&nbsp; * This folder can be changed by creating/modifying <i>mash.ini</i> or in the <a href="#SettingsWindow">Settings Window</a>.
 		  <p class=empty>&nbsp;</p>
 		<h2><a name='ModsTab'>Mods Tab</a></h2>
 		<img src="images/Wrye Mash_01.png" width="723" height="535" border="0" alt="Mods Tab">
@@ -1290,6 +1293,10 @@
 		  <p class=list-2>&bull;&nbsp; Note that ordering is important for many mods. Reversing the order of some mods may cause problems.
 		  <p class=empty>&nbsp;</p>
 		<h2><a name='Versions'>Versions</a></h2>
+		<h3><a name='84892010'>84 DCG 0.0.2 [8/9/2010]</a></h3>
+		<p class=list-1>&bull;&nbsp; Key shortcut for deletion in mods and saves tabs.
+		<p class=list-1>&bull;&nbsp; </a href="#InstallersTab">Installers Tab</a> improved (support for remote drives).
+		<p class=list-1>&bull;&nbsp; <a href="#SettingsWindow">Settings Window</a> improved: added the installers path field.
 		<h3><a name='847142010'>84 DCG 0.0.1 [7/14/2010]</a></h3>
 		<p class=list-1>&bull;&nbsp; <a href="#UtilsTab">Utilities Tab</a> improved with functions for creating/editing/deleting utilities.
 		<p class=list-1>&bull;&nbsp; <a href="#SettingsWindow">Settings Window</a> added: allow user to change some settings of Mash.
@@ -1842,6 +1849,8 @@
 		  <p class=list-2>&bull;&nbsp; Abot
 		<p class=list-1>&bull;&nbsp; <b><i>New help interface, Utilities tab and settings window</i></b>
 		  <p class=list-2>&bull;&nbsp; D.C.-G.
+		<p class=list-1>&bull;&nbsp; <b><i>Key shortcut for deletion in mods and saves tabs</i></b>
+		  <p class=list-2>&bull;&nbsp; From Wrye Bash, hinted by FallenWizard
 		  <p class=empty>&nbsp;</p>
 		<h3><a name='Contact'>Contact</a></h3>
 		<p class=list-1><i>Wrye</i>

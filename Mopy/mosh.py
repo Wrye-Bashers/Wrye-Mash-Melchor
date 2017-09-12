@@ -4191,8 +4191,11 @@ class InstallersData(bolt.TankData, DataDict):
 		"""Mark as having changed."""
 		self.hasChanged = hasChanged
 
+	#-# D.C.-G.
+	#-# Modified to avoid system error if installers path is not reachable.
 	def refresh(self,progress=None,what='DIONS',fullRefresh=False):
 		"""Refresh info."""
+		if not os.access(dirs["installers"].s, os.W_OK): return "noDir"
 		progress = progress or bolt.Progress()
 		#--MakeDirs
 		self.bashDir.makedirs()
@@ -4245,6 +4248,35 @@ class InstallersData(bolt.TankData, DataDict):
 			self.dictFile.data['sizeCrcDate'] = self.data_sizeCrcDate
 			self.dictFile.save()
 			self.hasChanged = False
+
+	#-# D.C.-G.
+	def saveCfgFile(self):
+		"""Save the installers path to mash.ini."""
+		mash_ini = False
+		if GPath('mash.ini').exists():
+			mashIni = ConfigParser.ConfigParser()
+			mashIni.read('mash.ini')
+			mash_ini = True
+			instPath = GPath(mashIni.get('General','sInstallersDir').strip()).s
+		else:
+			instPath = ""
+		if instPath != dirs["installers"].s:
+			if not mash_ini:
+				if os.path.exists(os.path.join(os.getcwd(), "mash_default.ini")):
+					f = open(os.path.join(os.getcwd(), "mash_default.ini"), "r")
+					d = f.read()
+					f.close()
+				else:
+					d = "[General]\n"
+				f = open(os.path.join(os.getcwd(), "mash.ini"), "w")
+				f.write(d)
+				f.close()
+				mashIni = ConfigParser.ConfigParser()
+				mashIni.read('mash.ini')
+			mashIni.set("General","sInstallersDir",os.path.abspath(dirs["installers"].s))
+			f = open(os.path.join(os.getcwd(), "mash.ini"),"w")
+			mashIni.write(f)
+			f.close()
 
 	def getSorted(self,column,reverse):
 		"""Returns items sorted according to column and reverse."""

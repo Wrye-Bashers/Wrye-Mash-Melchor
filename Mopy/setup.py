@@ -4,6 +4,14 @@ from distutils.core import setup
 # py2exe stuff
 import py2exe, os, sys, imp
 
+#-# retrieving wx install dir for getting msvcp71.dll and gdiplus.dll
+wxDlls = ("MSVCP71.dll","gdiplus.dll")
+import wx
+wxDir = os.path.split(wx.__file__)[0]
+del wx
+wxDlls = [os.path.join(wxDir, a) for a in wxDlls]
+#-#
+
 dest_folder = "..\\bin\\Mopy"
 
 ## Building up the distributable 'utils.dcg'
@@ -58,7 +66,8 @@ if "-q" not in sys.argv:
 if "py2exe" not in sys.argv:
 	sys.argv.append("py2exe")
 
-prog_resources = ['7z.exe','7z.dll','mash_default.ini','Wrye Mash.html','content.html','Wrye Mash.txt','readme.txt', 'sources.zip','utils.dcg']
+prog_resources = ['7z.exe','7z.dll','mash_default.ini','Wrye Mash.html','content.html','Wrye Mash.txt','readme.txt', 'sources.zip',
+				'utils.dcg'] + wxDlls
 
 ## Remove the old 'build' folder
 if os.access('.\\build', os.F_OK):
@@ -86,7 +95,7 @@ class Target:
 		self.name = "WryeMash"
 
 # includes for py2exe
-includes=[]
+includes=["wx"]
 
 opts = { 'py2exe': { 'includes':includes,
 						"compressed": 1,
