@@ -95,7 +95,7 @@ class Target:
 		self.name = "WryeMash"
 
 # includes for py2exe
-includes=["wx"]
+includes=["wx", "encodings"]
 
 opts = { 'py2exe': { 'includes':includes,
 						"compressed": 1,
