@@ -10,9 +10,15 @@
 #
 # SettingsWindow objects
 #
+# <13:06 09/08/2010>
+#
+# Added installers path.
+#
 import wx
 
-from mosh import _
+from mosh import _, dirs, GPath
+
+dataMap = {"Inst":"installers", "Mw":"Morrowind"}
 
 class SettingsWindow(wx.MiniFrame):
 	"""Class for the settings window."""
@@ -34,12 +40,16 @@ class SettingsWindow(wx.MiniFrame):
 		# components and sizers
 		btnOK = wx.Button(p, wx.ID_OK, _("Ok"), name="btnOK")
 		btnCancel = wx.Button(p, wx.ID_CANCEL, _("Cancel"), name="btnCancel")
-		btnBrowseMw = wx.Button(p, wx.ID_OPEN, _("..."), size=(-1,-1))
+		btnBrowseMw = wx.Button(p, wx.ID_OPEN, _("..."), size=(-1,-1), name="btnBrowseMw")
 		boxMwDir = wx.StaticBox(p, -1, _("Morrowind directory"))
-		self.fldMwDir = wx.TextCtrl(p, -1)
+		self.fldMw = wx.TextCtrl(p, -1, name="fldMw")
 		sizerBoxMwDir = wx.StaticBoxSizer(boxMwDir, wx.HORIZONTAL)
-		sizerBoxMwDir.AddMany([(self.fldMwDir,1,wx.EXPAND),((2,0)),(btnBrowseMw,0)])
-		sizerBoxInstallersDir = wx.BoxSizer(wx.VERTICAL)
+		sizerBoxMwDir.AddMany([(self.fldMw,1,wx.EXPAND),((2,0)),(btnBrowseMw,0)])
+		btnBrowseInst = wx.Button(p, wx.ID_OPEN, _("..."), size=(-1,-1), name="btnBrowseInst")
+		boxInst = wx.StaticBox(p, -1, _("Mods installers"))
+		self.fldInst = wx.TextCtrl(p, -1, name="fldInst")
+		sizerBoxInstallersDir = wx.StaticBoxSizer(boxInst, wx.HORIZONTAL)
+		sizerBoxInstallersDir.AddMany([(self.fldInst,1,wx.EXPAND),((2,0)),(btnBrowseInst,0)])
 		sizerFields = wx.BoxSizer(wx.VERTICAL)
 		sizerFields.AddMany([(sizerBoxMwDir,0,wx.EXPAND),((0,2)),(sizerBoxInstallersDir,0,wx.EXPAND)])
 		sizerBtn = wx.BoxSizer(wx.HORIZONTAL)
@@ -55,7 +65,7 @@ class SettingsWindow(wx.MiniFrame):
 		self.Fit()
 		wx.EVT_BUTTON(self, wx.ID_CANCEL, self.OnCancel)
 		wx.EVT_BUTTON(self, wx.ID_OK, self.OnOk)
-		wx.EVT_BUTTON(self, wx.ID_OPEN, self.OnBrowseMw)
+		wx.EVT_BUTTON(self, wx.ID_OPEN, self.OnBrowse)
 		wx.EVT_SIZE(self, self.OnSize)
 
 	def OnSize(self, event):
@@ -65,15 +75,16 @@ class SettingsWindow(wx.MiniFrame):
 			self.SetSizeHints(*self.GetSize())
 			self.init = False
 
-	def OnBrowseMw(self, event):
+	def OnBrowse(self, event):
 		"""Chosing Morrowind directory."""
-		dialog = wx.DirDialog(self, _("Morrowind directory selection"))
+		name = event.EventObject.Name[9:]
+		dialog = wx.DirDialog(self, _("%s directory selection")%dataMap[name].capitalize())
 		if dialog.ShowModal() != wx.ID_OK:
 			dialog.Destroy()
 			return
 		path = dialog.GetPath()
 		dialog.Destroy()
-		self.fldMwDir.SetValue(path)
+		getattr(self, "fld%s"%name).SetValue(path)
 
 	def OnCancel(self, event):
 		"""Cancel button handler."""
@@ -81,7 +92,12 @@ class SettingsWindow(wx.MiniFrame):
 
 	def OnOk(self, event):
 		"""Ok button handler."""
-		self.settings["mwDir"] = self.fldMwDir.GetValue()
+		self.settings["mwDir"] = self.fldMw.GetValue()
+		for item in self.Panel.GetChildren():
+			if item.Name.startswith("fld") == True and item.Name[3:] in dataMap:
+				name = dataMap[item.Name[3:]]
+				if name in dirs:
+					dirs[name] = GPath(item.GetValue())
 		self.Close()
 
 	def Close(self):
@@ -90,7 +106,12 @@ class SettingsWindow(wx.MiniFrame):
 		# self.settings.save()
 		wx.MiniFrame.Close(self)
 
-	def SetSettings(self, settings):
+	def SetSettings(self, settings, **kwargs):
 		"""External settings change."""
 		self.settings = settings
-		self.fldMwDir.SetValue(settings["mwDir"])
+		self.fldMw.SetValue(settings["mwDir"])
+		if kwargs != {}:
+			for a in kwargs.keys():
+				item = getattr(self, "fld%s"%a, None)
+				if item:
+					item.SetValue(kwargs[a])
