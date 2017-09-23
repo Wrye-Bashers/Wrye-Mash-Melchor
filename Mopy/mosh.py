@@ -5415,7 +5415,8 @@ class FileRep:
     def save(self, outPath=None):
         """Save data to file.
         outPath -- Path of the output file to write to. Defaults to original file path."""
-        if (not self.canSave): raise StateError(_("Insufficient data to write file."))
+        if (not self.canSave):
+            raise StateError(_("Insufficient data to write file."))
         if not outPath:
             fileInfo = self.fileInfo
             outPath = os.path.join(fileInfo.dir, fileInfo.name)
