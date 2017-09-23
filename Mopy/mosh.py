@@ -113,7 +113,8 @@ def compileTranslator(txtPath, pklPath):
     filePath = pklPath
     tempPath = filePath + '.tmp'
     cPickle.dump(translator, open(tempPath, 'w'))
-    if os.path.exists(filePath): os.remove(filePath)
+    if os.path.exists(filePath):
+        os.remove(filePath)
     os.rename(tempPath, filePath)
 
 
@@ -341,14 +342,18 @@ class Settings:
 
     def __setitem__(self, key, value):
         """Dictionary emulation. Marks key as changed."""
-        if key in self.deleted: self.deleted.remove(key)
-        if key not in self.changed: self.changed.append(key)
+        if key in self.deleted:
+            self.deleted.remove(key)
+        if key not in self.changed:
+            self.changed.append(key)
         self.data[key] = value
 
     def __delitem__(self, key):
         """Dictionary emulation. Marks key as deleted."""
-        if key in self.changed: self.changed.remove(key)
-        if key not in self.deleted: self.deleted.append(key)
+        if key in self.changed:
+            self.changed.remove(key)
+        if key not in self.deleted:
+            self.deleted.append(key)
         del self.data[key]
 
 
@@ -418,7 +423,8 @@ class Table:
             filePath = self.path
             tempPath = filePath + '.tmp'
             fileDir = os.path.split(filePath)[0]
-            if not os.path.exists(fileDir): os.makedirs(fileDir)
+            if not os.path.exists(fileDir):
+                os.makedirs(fileDir)
             cPickle.dump(self.data, open(tempPath, 'w'))
             renameFile(tempPath, filePath, True)
             self.hasChanged = False
@@ -497,18 +503,18 @@ class PickleDict(bolt.PickleDict):
     def load(self):
         """Loads vdata and data from file or backup file.
 
-		If file does not exist, or is corrupt, then reads from backup file. If
-		backup file also does not exist or is corrupt, then no data is read. If
-		no data is read, then self.data is cleared.
+        If file does not exist, or is corrupt, then reads from backup file. If
+        backup file also does not exist or is corrupt, then no data is read. If
+        no data is read, then self.data is cleared.
 
-		If file exists and has a vdata header, then that will be recorded in
-		self.vdata. Otherwise, self.vdata will be empty.
+        If file exists and has a vdata header, then that will be recorded in
+        self.vdata. Otherwise, self.vdata will be empty.
 
-		Returns:
-		0: No data read (files don't exist and/or are corrupt)
-		1: Data read from file
-		2: Data read from backup file
-		"""
+        Returns:
+          0: No data read (files don't exist and/or are corrupt)
+          1: Data read from file
+          2: Data read from backup file
+        """
         result = bolt.PickleDict.load(self)
         if not result and self.oldPath.exists():
             ins = None
@@ -518,7 +524,8 @@ class PickleDict(bolt.PickleDict):
                 ins.close()
                 result = 1
             except EOFError:
-                if ins: ins.close()
+                if ins:
+                    ins.close()
         # --Done
         return result
 
@@ -623,7 +630,7 @@ def listSubtract(alist, blist):
 
 def renameFile(oldPath, newPath, makeBack=False):
     """Moves file from oldPath to newPath. If newPath already exists then it
-	will either be moved to newPath.bak or deleted depending on makeBack."""
+    will either be moved to newPath.bak or deleted depending on makeBack."""
     if os.path.exists(newPath):
         if makeBack:
             backPath = newPath + '.bak'
@@ -654,12 +661,12 @@ def winNewLines(inString):
 # ------------------------------------------------------------------------------
 class Log:
     """Log Callable. This is the abstract/null version. Useful version should
-	override write functions.
+    override write functions.
 
-	Log is divided into sections with headers. Header text is assigned (through
-	setHeader), but isn't written until a message is written under it. I.e.,
-	if no message are written under a given header, then the header itself is
-	never written."""
+    Log is divided into sections with headers. Header text is assigned (through
+    setHeader), but isn't written until a message is written under it. I.e.,
+    if no message are written under a given header, then the header itself is
+    never written."""
 
     def __init__(self):
         """Initialize."""
@@ -726,7 +733,8 @@ class Progress:
         self.max = 1.0
 
     def setBaseScale(self, base=0.0, scale=1.0):
-        if scale == 0: raise ArgumentError(_('Scale must not equal zero!'))
+        if scale == 0:
+            raise ArgumentError(_('Scale must not equal zero!'))
         self.base = base
         self.scale = scale
 
@@ -734,7 +742,8 @@ class Progress:
         self.max = 1.0 * max or 1.0  # --Default to 1.0
 
     def __call__(self, rawProgress, message=None):
-        if not message: message = self.message
+        if not message:
+            message = self.message
         if ((message != self.message) or
             (time.time() > (self.time + self.interval))):
             self.doProgress(self.base + self.scale * rawProgress / self.max,
@@ -763,7 +772,7 @@ class ProgressFile(Progress):
 # ------------------------------------------------------------------------------
 class Tes3Reader:
     """Wrapper around an TES3 file in read mode.
-	Will throw a Tes3ReadError if read operation fails to return correct size."""
+    Will throw a Tes3ReadError if read operation fails to return correct size."""
 
     def __init__(self, inName, ins):
         """Initialize."""
@@ -871,8 +880,9 @@ class Tes3Writer:
 
     def packSub(self, type, data, *values):
         """Write subrecord header and data to output stream.
-		Call using either packSub(type,data), or packSub(type,format,values)."""
-        if values: data = struct.pack(data, *values)
+        Call using either packSub(type,data), or packSub(type,format,values)."""
+        if values:
+            data = struct.pack(data, *values)
         self.out.write(struct.pack('4si', type, len(data)))
         self.out.write(data)
 
@@ -894,7 +904,8 @@ class SubRecord:
         self.size = size
         self.data = None
         self.inName = ins and getattr(ins, 'inName', None)
-        if ins: self.load(ins, unpack)
+        if ins:
+            self.load(ins, unpack)
 
     def load(self, ins, unpack=False):
         self.data = ins.read(self.size, '----.----')
@@ -910,7 +921,8 @@ class SubRecord:
 
     def getSize(self):
         """Return size of self.data, after, if necessary, packing it."""
-        if not self.changed: return self.size
+        if not self.changed:
+            return self.size
         # --StringIO Object
         out = Tes3Writer(cStringIO.StringIO())
         self.dumpData(out)
@@ -926,8 +938,10 @@ class SubRecord:
         raise AbstractError
 
     def dump(self, out):
-        if self.changed: raise StateError(_('Data changed: ') + self.name)
-        if not self.data: raise StateError(_('Data undefined: ') + self.name)
+        if self.changed:
+            raise StateError(_('Data changed: ') + self.name)
+        if not self.data:
+            raise StateError(_('Data undefined: ') + self.name)
         out.write(struct.pack('4si', self.name, len(self.data)))
         out.write(self.data)
 
@@ -945,7 +959,8 @@ class Record:
         self.data = None
         self.id = None
         self.inName = ins and getattr(ins, 'inName', None)
-        if ins: self.load(ins, unpack)
+        if ins:
+            self.load(ins, unpack)
 
     def load(self, ins=None, unpack=False):
         """Load data from ins stream or internal data buffer."""
@@ -979,12 +994,14 @@ class Record:
         self.size = len(data)
 
     def getSize(self):
-        if self.changed: raise AbstractError
+        if self.changed:
+            raise AbstractError
         return self.size
 
     def getSize(self):
         """Return size of self.data, after, if necessary, packing it."""
-        if not self.changed: return self.size
+        if not self.changed:
+            return self.size
         # --Pack data and return size.
         out = Tes3Writer(cStringIO.StringIO())
         self.dumpData(out)
@@ -1000,8 +1017,10 @@ class Record:
 
     def dump(self, out):
         """Dumps record header and data into output file stream."""
-        if self.changed: raise StateError(_('Data changed: ') + self.name)
-        if not self.data: raise StateError(_('Data undefined: ') + self.name)
+        if self.changed:
+            raise StateError(_('Data changed: ') + self.name)
+        if not self.data:
+            raise StateError(_('Data undefined: ') + self.name)
         out.write(struct.pack('4s3i', self.name, self.size, self.delFlag,
             self.recFlag))
         out.write(self.data)
@@ -1231,14 +1250,19 @@ class Book(Record):
             out.packSub('DELE', 'i', 0)
             return
         out.packSub0('MODL', self.model)
-        if self.title:   out.packSub0('FNAM', self.title)
+        if self.title:
+            out.packSub0('FNAM', self.title)
         out.packSub('BKDT', 'f4i',
             self.weight, self.value, self.isScroll, self.teaches,
             self.enchantPoints)
-        if self.script:  out.packSub0('SCRI', self.script)
-        if self.icon:    out.packSub0('ITEX', self.icon)
-        if self.text:    out.packSub0('TEXT', self.text)
-        if self.enchant: out.packSub0('TEXT', self.enchant)
+        if self.script:
+            out.packSub0('SCRI', self.script)
+        if self.icon:
+            out.packSub0('ITEX', self.icon)
+        if self.text:
+            out.packSub0('TEXT', self.text)
+        if self.enchant:
+            out.packSub0('TEXT', self.enchant)
 
 
 # ------------------------------------------------------------------------------
@@ -1326,7 +1350,8 @@ class Cell(Record):
             (name, size) = ins.unpackSubHeader('CELL')
             # --New reference?
             if name == 'FRMR':
-                if not subGroup: subGroup = 10
+                if not subGroup:
+                    subGroup = 10
                 # --Spawned? Then just another subrecord.
                 if isSpawned:
                     isSpawned = False
@@ -1337,8 +1362,8 @@ class Cell(Record):
                     bytesRead += 8 + size
                 # --New Record?
                 else:
-                    if size != 4: raise Tes3SizeError(self.inName, 'CELL.FRMR',
-                        size, 4, True)
+                    if size != 4:
+                        raise Tes3SizeError(self.inName, 'CELL.FRMR', size, 4, True)
                     rawData = ins.read(4, 'CELL.FRMR')
                     iMod = struct.unpack('3xB', rawData)[0]
                     iObj = struct.unpack('i', rawData[:3] + '\x00')[0]
@@ -1359,7 +1384,7 @@ class Cell(Record):
                         self.objects.append(object)
                     else:
                         self.tempObjects.append(object)
-                    # print '  %7d %3d %s' % (iObj,iMod,objId)
+                        # print '  %7d %3d %s' % (iObj,iMod,objId)
             # --Leveled Creature? (Ninja Monkey)
             elif name == 'LVCR':
                 isSpawned = True
@@ -1375,7 +1400,8 @@ class Cell(Record):
                 bytesRead += 8 + size
             # --Move Ref?
             elif name == 'MVRF' and not isSpawned:
-                if not subGroup: subGroup = 10
+                if not subGroup:
+                    subGroup = 10
                 isMoved = True
                 if skipObjRecords:
                     ins.seek(size, 1, 'CELL.MVRF')
@@ -1388,10 +1414,10 @@ class Cell(Record):
                     raise Tes3Error(self.ins,
                         self.getId() + _(': Second NAM0 subrecord.'))
                 subGroup = 20
-                if size != 4: raise Tes3SizeError(self.inName, 'CELL.NAM0',
-                    size, 4, True)
-                if size != 4: raise Tes3SizeError(self.inName, 'CELL.NAM0',
-                    size, 4, True)
+                if size != 4:
+                    raise Tes3SizeError(self.inName, 'CELL.NAM0', size, 4, True)
+                if size != 4:
+                    raise Tes3SizeError(self.inName, 'CELL.NAM0', size, 4, True)
                 nam0 = ins.unpack('i', 4, 'CELL.NAM0')[0]
                 bytesRead += 8 + size
             # --Start subrecord?
@@ -1402,7 +1428,7 @@ class Cell(Record):
                     (self.flags, self.gridX, self.gridY) = struct.unpack('3i',
                         record.data)
                 bytesRead += 8 + size
-            # print ' ',name,size
+                # print ' ',name,size
             # --Object sub-record?
             elif subGroup < 30:
                 # if isSpawned:
@@ -1412,12 +1438,12 @@ class Cell(Record):
                 else:
                     objRecords.append(SubRecord(name, size, ins))
                 bytesRead += 8 + size
-            # print '    ',name,size
+                # print '    ',name,size
             # --End subrecord?
             elif subGroup == 30:
                 self.endRecords.append(SubRecord(name, size, ins))
                 bytesRead += 8 + size
-            # print ' ',name,size
+                # print ' ',name,size
             # print ' ',name,size
         # --Nam0 miscount?
         if nam0 != len(self.tempObjects):
@@ -1433,7 +1459,8 @@ class Cell(Record):
         out.packSub0('NAME', self.cellName)
         # --Hack: Insert data record if necessary
         for record in self.records:
-            if record.name == 'DATA': break
+            if record.name == 'DATA':
+                break
         else:
             self.records.insert(0, SubRecord('DATA', 0))
         # --Top Records
@@ -1574,8 +1601,8 @@ class Dial(Record):
         # --Build infosById
         infosById = {}
         for info in self.infos:
-            if info.id == None: raise Tes3Error(self.inName,
-                _('Dialog %s: info with missing id.') % (self.id,))
+            if info.id == None:
+                raise Tes3Error(self.inName, _('Dialog %s: info with missing id.') % (self.id,))
             infosById[info.id] = info
         # --Heads
         heads = []
@@ -1634,7 +1661,8 @@ class Fmap(Record):
 
     def drawRect(self, color, x1, y1, x2, y2):
         """Draw rectangle of specified color."""
-        if not self.changed: self.edit()
+        if not self.changed:
+            self.edit()
         wmap = 512
         mapd = self.mapd
         for y in xrange(y1, y2):
@@ -1651,7 +1679,8 @@ class Fmap(Record):
 
     def drawGrid(self, gridLines=True):
         """Draw grid for visible map."""
-        if not self.changed: self.edit()
+        if not self.changed:
+            self.edit()
         cGrid = Fmap.GRID
         cBorder = Fmap.BORDER
         if gridLines:  # --Some fools don't want the grid!
@@ -1671,7 +1700,8 @@ class Fmap(Record):
         """Draw a cell from landscape record."""
         from math import sqrt, pow
         # --Tranlate grid point (u,v) to pixel point
-        if not self.changed: self.edit()
+        if not self.changed:
+            self.edit()
         # --u/v max/min are grid range of visible map.
         # --wcell is bit width of cell. 512 is bit width of visible map.
         (umin, umax, vmin, vmax, wcell, wmap) = (-28, 27, -27, 28, 9, 512)
@@ -1784,7 +1814,8 @@ class Info_Test:
         out.pack('4siBB2sB',
             'SCVR', 5 + len(self.text), index + 48, self.type, self.func,
             self.oper)
-        if self.text: out.write(self.text)
+        if self.text:
+            out.write(self.text)
         # --Value
         if isinstance(self.value, int):
             out.packSub('INTV', 'i', self.value)
@@ -1902,36 +1933,52 @@ class Info(Record):
             out.packSub('DATA', '2i4B',
                 self.type, self.spDisp, self.spRank, self.spSex, self.pcRank,
                 self.unk02)
-        if self.spId:       out.packSub0('ONAM', self.spId)
-        if self.spRace:     out.packSub0('RNAM', self.spRace)
-        if self.spClass:    out.packSub0('CNAM', self.spClass)
-        if self.spFaction:  out.packSub0('FNAM', self.spFaction)
-        if self.cell:       out.packSub0('ANAM', self.cell)
-        if self.pcFaction:  out.packSub0('DNAM', self.pcFaction)
-        if self.speak:      out.packSub0('SNAM', self.speak)
-        if self.text:       out.packSub('NAME', self.text)
+        if self.spId:
+            out.packSub0('ONAM', self.spId)
+        if self.spRace:
+            out.packSub0('RNAM', self.spRace)
+        if self.spClass:
+            out.packSub0('CNAM', self.spClass)
+        if self.spFaction:
+            out.packSub0('FNAM', self.spFaction)
+        if self.cell:
+            out.packSub0('ANAM', self.cell)
+        if self.pcFaction:
+            out.packSub0('DNAM', self.pcFaction)
+        if self.speak:
+            out.packSub0('SNAM', self.speak)
+        if self.text:
+            out.packSub('NAME', self.text)
         if self.qflag == 0:
             pass
-        if self.qflag == 1: out.packSub('QSTN', '\x01')
-        if self.qflag == 2: out.packSub('QSTF', '\x01')
-        if self.qflag == 3: out.packSub('QSTR', '\x01')
+        if self.qflag == 1:
+            out.packSub('QSTN', '\x01')
+        if self.qflag == 2:
+            out.packSub('QSTF', '\x01')
+        if self.qflag == 3:
+            out.packSub('QSTR', '\x01')
         for index, test in enumerate(self.tests):
-            if test: test.dumpData(out, index)
-        if self.script:     out.packSub('BNAM', self.script)
-        if self.isDeleted:  out.pack('DELE', 'i', 0)
+            if test:
+                test.dumpData(out, index)
+        if self.script:
+            out.packSub('BNAM', self.script)
+        if self.isDeleted:
+            out.pack('DELE', 'i', 0)
 
     def compactTests(self, mode='TOP'):
         """Compacts test array. I.e., moves test up into any empty slots if present.
-		mode: 'TOP' Eliminate only leading empty tests. [0,0,1,0,1] >> [1,0,1]
-		mode: 'ALL' Eliminat all empty tests. [0,0,1,0,1] >> [1,1]"""
-        if tuple(self.tests) == (0, 0, 0, 0, 0, 0): return False
+        mode: 'TOP' Eliminate only leading empty tests. [0,0,1,0,1] >> [1,0,1]
+        mode: 'ALL' Eliminat all empty tests. [0,0,1,0,1] >> [1,1]"""
+        if tuple(self.tests) == (0, 0, 0, 0, 0, 0):
+            return False
         if mode == 'TOP':
             newTests = self.tests[:]
             while newTests and not newTests[0]:
                 del newTests[0]
         else:
             newTests = [test for test in self.tests if test]
-        while len(newTests) < 6: newTests.append(0)
+        while len(newTests) < 6:
+            newTests.append(0)
         if tuple(self.tests) != tuple(newTests):
             self.tests = newTests
             self.setChanged()
@@ -1941,8 +1988,8 @@ class Info(Record):
 # ------------------------------------------------------------------------------
 class InfoS(Record):
     """INFO record. Dialog/journal entry.
-	This is a simpler version of the info record. It expands just enough for
-	dialog import/export."""
+    This is a simpler version of the info record. It expands just enough for
+    dialog import/export."""
 
     def __init__(self, name='INFO', size=0, delFlag=0, recFlag=0, ins=None,
         unpack=False):
@@ -2012,7 +2059,8 @@ class Land(Record):
 
     def getId(self):
         """Return id. Also, extract gridX and gridY."""
-        if self.id: return self.id
+        if self.id:
+            return self.id
         reader = self.getReader()
         subData = reader.findSubRecord('INTV', 'LAND')
         (self.gridX, self.gridY) = struct.unpack('ii', subData)
@@ -2021,10 +2069,12 @@ class Land(Record):
 
     def getHeights(self):
         """Returns len(65x65) array of vertex heights."""
-        if self.heights: return self.heights
+        if self.heights:
+            return self.heights
         reader = self.getReader()
         subData = reader.findSubRecord('VHGT', 'LAND')
-        if not subData: return None
+        if not subData:
+            return None
         height0 = struct.unpack('f', subData[:4])[0]
         import array
         deltas = array.array('b', subData[4:4 + 65 * 65])
@@ -2126,9 +2176,10 @@ class Scpt(Record):
     def getRef(self):
         """Returns reference data for a global script."""
         rnam = self.rnam
-        if not rnam or rnam.data == chr(255) * 4: return None
-        if rnam.size != 4: raise Tes3Error(self.inName, _('SCPT.RNAM'),
-            rnam.size, 4, True)
+        if not rnam or rnam.data == chr(255) * 4:
+            return None
+        if rnam.size != 4:
+            raise Tes3Error(self.inName, _('SCPT.RNAM'), rnam.size, 4, True)
         iMod = struct.unpack('3xB', rnam.data)[0]
         iObj = struct.unpack('i', rnam.data[:3] + '\x00')[0]
         return (iMod, iObj)
@@ -2147,12 +2198,14 @@ class Scpt(Record):
         self.dataSize = 2
         # self.varSize = 0
         # --SCDT
-        if not self.scdt: self.scdt = SubRecord('SCDT', 0)
+        if not self.scdt:
+            self.scdt = SubRecord('SCDT', 0)
         self.scdt.setData(struct.pack('BB', 1, 1))  # --Uncompiled
         # --SCVR
         # self.scvr = None
         # --SCTX (Code)
-        if not self.sctx: self.sctx = SubRecord('SCTX', 0)
+        if not self.sctx:
+            self.sctx = SubRecord('SCTX', 0)
         self.sctx.setData(winNewLines(code))
         # --Done
         self.setChanged()
@@ -2168,7 +2221,8 @@ class Scpt(Record):
         # --Others
         for record in [getattr(self, srName.lower(), None) for srName in
             Scpt.subRecordNames]:
-            if not record: continue
+            if not record:
+                continue
             record.size = len(record.data)
             record.dump(out)
 
@@ -2188,7 +2242,8 @@ class Tes3_Hedr(SubRecord):
 
     def load(self, ins, unpack=False):
         self.data = ins.read(self.size, 'TES3.HEDR')
-        if not unpack: return
+        if not unpack:
+            return
         data = struct.unpack('fi32s256si', self.data)
         self.version = data[0]
         self.fileType = data[1]
@@ -2197,9 +2252,10 @@ class Tes3_Hedr(SubRecord):
         self.numRecords = data[4]
 
     def getSize(self):
-        if not self.data and not self.changed: raise StateError(
-            _('Data undefined: ') + self.name)
-        if not self.changed: return self.size
+        if not self.data and not self.changed:
+            raise StateError(_('Data undefined: ') + self.name)
+        if not self.changed:
+            return self.size
         self.description = winNewLines(self.description)
         self.data = struct.pack('fi32s256si',
             self.version,
@@ -2218,7 +2274,8 @@ class Tes3_Gmdt(SubRecord):
 
     def load(self, ins, unpack=False):
         self.data = ins.read(self.size, 'TES3.GMDT')
-        if not unpack: return
+        if not unpack:
+            return
         data = struct.unpack('3f12s64s4s32s', self.data)
         self.curHealth = data[0]
         self.maxHealth = data[1]
@@ -2229,8 +2286,10 @@ class Tes3_Gmdt(SubRecord):
         self.playerName = cstrip(data[6])
 
     def getSize(self):
-        if not self.data: raise StateError(_('Data undefined: ') + self.name)
-        if not self.changed: return self.size
+        if not self.data:
+            raise StateError(_('Data undefined: ') + self.name)
+        if not self.changed:
+            return self.size
         self.data = struct.pack('3f12s64s4s32s',
             self.curHealth,
             self.maxHealth,
@@ -2267,8 +2326,8 @@ class Tes3(Record):
         # --Read Records
         while bytesRead < self.size:
             (name, size) = ins.unpackSubHeader('TES3')
-            if size > MAX_SUB_SIZE: raise Tes3SizeError(self.inName, name, size,
-                -MAX_SUB_SIZE, True)
+            if size > MAX_SUB_SIZE:
+                raise Tes3SizeError(self.inName, name, size, -MAX_SUB_SIZE, True)
             # --Masters
             if name == 'MAST':
                 # --FileName
@@ -2367,8 +2426,8 @@ class MWIniFile:
 
     def saveSettings(self, settings):
         """Applies dictionary of settings to ini file.
-		Values in settings dictionary can be either actual values or
-		full key=value line ending in newline char."""
+        Values in settings dictionary can be either actual values or
+        full key=value line ending in newline char."""
         settings = dict(
             (LString(x), dict((LString(u), v) for u, v in y.iteritems()))
                 for x, y in settings.iteritems())
@@ -2403,7 +2462,7 @@ class MWIniFile:
 
     def applyMit(self, mitPath):
         """Read MIT file and apply its settings to morrowind.ini.
-		Note: Will ONLY apply settings that already exist."""
+        Note: Will ONLY apply settings that already exist."""
         reComment = re.compile(';.*')
         reSection = re.compile(r'^\[\s*(.+?)\s*\]$')
         reSetting = re.compile(r'(.+?)\s*=')
@@ -2464,7 +2523,8 @@ class MWIniFile:
                 raise Tes3Error('Morrowind.ini',
                     _('Morrowind.ini: [GameFiles] section not found.'))
             maLoadFiles = reLoadFiles.match(line)
-            if maLoadFiles: break
+            if maLoadFiles:
+                break
             self.preLoadLines.append(line)
         # --Load Files
         self.loadFilesComment = maLoadFiles.group(1)
@@ -2474,7 +2534,8 @@ class MWIniFile:
             line = ins.readline()
             maLoadFile = reLoadFile.match(line)
             if not maLoadFile:
-                if line: self.postLoadLines.append(line)
+                if line:
+                    self.postLoadLines.append(line)
                 break
             loadFile = maLoadFile.group(1)
             loadPath = os.path.join(self.dir, 'Data Files', loadFile)
@@ -2488,14 +2549,16 @@ class MWIniFile:
         # --Post-Load Lines
         while True:
             line = ins.readline()
-            if not line: break
+            if not line:
+                break
             self.postLoadLines.append(line)
         # --Done
         ins.close()
 
     def save(self):
         """Write data to morrowind.ini file."""
-        if self.hasChanged(): raise StateError(_('Morrowind.ini has changed'))
+        if self.hasChanged():
+            raise StateError(_('Morrowind.ini has changed'))
         out = file(self.path, 'wt')
         for line in self.preLoadLines:
             out.write(line)
@@ -2536,7 +2599,8 @@ class MWIniFile:
     def refresh(self):
         """Load only if morrowind.ini has changed."""
         hasChanged = self.hasChanged()
-        if hasChanged: self.loadIni()
+        if hasChanged:
+            self.loadIni()
         if len(self.loadFiles) > 255:
             del self.loadFiles[255:]
             self.safeSave()
@@ -2606,7 +2670,8 @@ class MWIniFile:
         """Remove modFile from load list."""
         while modFile in self.loadFiles:
             self.loadFiles.remove(modFile)
-            if doSave: self.safeSave()
+            if doSave:
+                self.safeSave()
         self.refreshDoubleTime()
         self.loadOrder = modInfos.getLoadOrder(self.loadFiles)
 
@@ -2727,7 +2792,8 @@ class FileInfo:
         self.ctime = os.path.getctime(path)
         self.mtime = getmtime(path)
         self.size = os.path.getsize(path)
-        if self.tes3: self.getHeader()
+        if self.tes3:
+            self.getHeader()
 
     def setType(self, type):
         self.getHeader()
@@ -2745,8 +2811,8 @@ class FileInfo:
         try:
             ins = Tes3Reader(self.name, file(path, 'rb'))
             (name, size, delFlag, recFlag) = ins.unpackRecHeader()
-            if name != 'TES3': raise Tes3Error(self.name,
-                _('Expected TES3, but got ') + name)
+            if name != 'TES3':
+                raise Tes3Error(self.name, _('Expected TES3, but got ') + name)
             self.tes3 = Tes3(name, size, delFlag, recFlag, ins, True)
         except struct.error, rex:
             ins.close()
@@ -2860,10 +2926,12 @@ class FileInfo:
         self.mtime = getmtime(path)
 
     def makeBackup(self, forceBackup=False):
-        if self.madeBackup and not forceBackup: return
+        if self.madeBackup and not forceBackup:
+            return
         # --Backup Directory
         backupDir = os.path.join(self.dir, settings['mosh.fileInfo.backupDir'])
-        if not os.path.exists(backupDir): os.makedirs(backupDir)
+        if not os.path.exists(backupDir):
+            os.makedirs(backupDir)
         # --File Path
         original = os.path.join(self.dir, self.name)
         # --Backup
@@ -2897,7 +2965,8 @@ class FileInfo:
     # --Snapshot Parameters
     def getNextSnapshot(self):
         destDir = os.path.join(self.dir, settings['mosh.fileInfo.snapshotDir'])
-        if not os.path.exists(destDir): os.makedirs(destDir)
+        if not os.path.exists(destDir):
+            os.makedirs(destDir)
         (root, ext) = os.path.splitext(self.name)
         destName = root + '-00' + ext
         separator = '-'
@@ -2906,7 +2975,8 @@ class FileInfo:
         reSnap = re.compile('^' + root + '-([0-9\.]*[0-9]+)' + ext + '$')
         for fileName in os.listdir(destDir):
             maSnap = reSnap.match(fileName)
-            if not maSnap: continue
+            if not maSnap:
+                continue
             snapNew = maSnap.group(1).split('.')
             # --Compare shared version numbers
             sharedNums = min(len(snapNew), len(snapLast))
@@ -2988,7 +3058,8 @@ class FileInfos:
         added = []
         updated = []
         deleted = []
-        if not os.path.exists(self.dir): os.makedirs(self.dir)
+        if not os.path.exists(self.dir):
+            os.makedirs(self.dir)
         # --Loop over files in directory
         for fileName in os.listdir(self.dir):
             # --Right file type?
@@ -3069,12 +3140,14 @@ class FileInfos:
         # --Misc. Editor backups
         for ext in ('.bak', '.tmp', '.old'):
             backPath = filePath + ext
-            if os.path.exists(backPath): os.remove(backPath)
+            if os.path.exists(backPath):
+                os.remove(backPath)
         # --Backups
         backRoot = os.path.join(fileInfo.dir,
             settings['mosh.fileInfo.backupDir'], fileInfo.name)
         for backPath in (backRoot, backRoot + 'f'):
-            if os.path.exists(backPath): os.remove(backPath)
+            if os.path.exists(backPath):
+                os.remove(backPath)
         self.refresh()
 
     # --Move Exists
@@ -3097,7 +3170,8 @@ class FileInfos:
         """Copies member file to destDir. Will overwrite!"""
         if not os.path.exists(destDir):
             os.makedirs(destDir)
-        if not destName: destName = fileName
+        if not destName:
+            destName = fileName
         srcPath = os.path.join(self.dir, fileName)
         destPath = os.path.join(destDir, destName)
         if os.path.exists(destPath):
@@ -3303,7 +3377,8 @@ class ModInfos(FileInfos):
         stackTop = stack[-1]
         masters = masters or (
         stackTop in self.data and self.data[stackTop].masterNames)
-        if not masters: return False
+        if not masters:
+            return False
         for master in masters:
             if master in stack:
                 return True
@@ -3328,7 +3403,7 @@ class ModInfos(FileInfos):
         #    grandmaster will be first to be added.
         def preMaster(modName, modDex):
             """If necessary, move grandmasters in front of master -- but in
-			reverse order."""
+            reverse order."""
             if self.data.has_key(modName):
                 mmNames = list(self.data[modName].masterNames[:])
                 mmNames.reverse()
@@ -3346,7 +3421,8 @@ class ModInfos(FileInfos):
         modDex = 1
         while modDex < len(modNames):
             modName = modNames[modDex]
-            if modName[-1].lower() != 'm': break
+            if modName[-1].lower() != 'm':
+                break
             if self.circularMasters([modName]):
                 modDex += 1
             else:
@@ -3380,24 +3456,29 @@ class ModInfos(FileInfos):
         loadFiles = mwIniFile.loadFiles[:]
         for loadFile in loadFiles:
             # --Already unloaded? (E.g., grandchild)
-            if not mwIniFile.isLoaded(loadFile): continue
-            if loadFile not in self.data: continue  # --Can happen if user does an external delete.
+            if not mwIniFile.isLoaded(loadFile):
+                continue
+            if loadFile not in self.data:
+                continue  # --Can happen if user does an external delete.
             # --One of loadFile's masters?
             for master in self[loadFile].tes3.masters:
                 if master[0] == fileName:
                     self.unload(loadFile, False)
                     break
         # --Save
-        if doSave: mwIniFile.safeSave()
+        if doSave:
+            mwIniFile.safeSave()
 
     # --Rename
     def rename(self, oldName, newName):
         """Renames member file from oldName to newName."""
         isLoaded = self.isLoaded(oldName)
-        if isLoaded: self.unload(oldName)
+        if isLoaded:
+            self.unload(oldName)
         FileInfos.rename(self, oldName, newName)
         self.refreshDoubleTime()
-        if isLoaded: self.load(newName)
+        if isLoaded:
+            self.load(newName)
 
     # --Delete
     def delete(self, fileName):
@@ -3429,22 +3510,26 @@ class ModInfos(FileInfos):
     # --Object Maps ------------------------------------------------------------
     def addObjectMap(self, fromMod, toMod, objectMap):
         """Add an objectMap with key(fromMod,toMod)."""
-        if self.objectMaps == None: self.loadObjectMaps()
+        if self.objectMaps == None:
+            self.loadObjectMaps()
         self.objectMaps[(fromMod, toMod)] = objectMap
 
     def removeObjectMap(self, fromMod, toMod):
         """Deletes objectMap with key(fromMod,toMod)."""
-        if self.objectMaps == None: self.loadObjectMaps()
+        if self.objectMaps == None:
+            self.loadObjectMaps()
         del self.objectMaps[(fromMod, toMod)]
 
     def getObjectMap(self, fromMod, toMod):
         """Returns objectMap with key(fromMod,toMod)."""
-        if self.objectMaps == None: self.loadObjectMaps()
+        if self.objectMaps == None:
+            self.loadObjectMaps()
         return self.objectMaps.get((fromMod, toMod), None)
 
     def getObjectMaps(self, toMod):
         """Return a dictionary of ObjectMaps with fromMod key for toMod."""
-        if self.objectMaps == None: self.loadObjectMaps()
+        if self.objectMaps == None:
+            self.loadObjectMaps()
         subset = {}
         for key in self.objectMaps.keys():
             if key[1] == toMod:
@@ -3461,10 +3546,12 @@ class ModInfos(FileInfos):
 
     def saveObjectMaps(self):
         """Save ObjectMaps to file."""
-        if self.objectMaps == None: return
+        if self.objectMaps == None:
+            return
         path = os.path.join(self.dir, settings['mosh.modInfos.objectMaps'])
         outDir = os.path.split(path)[0]
-        if not os.path.exists(outDir): os.makedirs(outDir)
+        if not os.path.exists(outDir):
+            os.makedirs(outDir)
         cPickle.dump(self.objectMaps, open(path, 'wb'), 2)
 
 
@@ -3492,7 +3579,7 @@ class SaveInfo(FileInfo):
 
     def getStatus(self):
         """Returns the status, i.e., "health" level of the savegame. Based on
-		status/health of masters, plus synchronization with current load list."""
+        status/health of masters, plus synchronization with current load list."""
         status = FileInfo.getStatus(self)
         masterOrder = self.masterOrder
         # --File size?
@@ -3508,7 +3595,7 @@ class SaveInfo(FileInfo):
 
     def getJournal(self):
         """Returns the text of the journal from the savegame in slightly
-		modified html format."""
+        modified html format."""
         if 'journal' in self.extras:
             return self.extras['journal']
         # --Default
@@ -3543,7 +3630,7 @@ class SaveInfo(FileInfo):
 
     def getScreenshot(self):
         """Returns screenshot data with alpha info stripped out.
-		If screenshot data isn't available, returns None."""
+        If screenshot data isn't available, returns None."""
         # --Used cached screenshot, if have it.
         if 'screenshot' in self.extras:
             return self.extras['screenshot']
@@ -3552,8 +3639,8 @@ class SaveInfo(FileInfo):
         try:
             ins = Tes3Reader(self.name, file(path, 'rb'))
             (name, size, delFlag, recFlag) = ins.unpackRecHeader()
-            if name != 'TES3': raise Tes3Error(self.name,
-                _('Expected TES3, but got ') + name)
+            if name != 'TES3':
+                raise Tes3Error(self.name, _('Expected TES3, but got ') + name)
             self.tes3 = Tes3(name, size, delFlag, recFlag, ins, True)
         except struct.error, rex:
             ins.close()
@@ -3789,7 +3876,7 @@ class ScreensData(DataDict):
 # ------------------------------------------------------------------------------
 class Installer(object):
     """Object representing an installer archive, its user configuration, and
-	its installation state."""
+    its installation state."""
 
     # --Member data
     persistent = ('archive', 'order', 'group', 'modified', 'size', 'crc',
@@ -3846,7 +3933,8 @@ class Installer(object):
 
         def sortKey(file):
             dirFile = file.lower().rsplit('\\', 1)
-            if len(dirFile) == 1: dirFile.insert(0, '')
+            if len(dirFile) == 1:
+                dirFile.insert(0, '')
             return dirFile
 
         sortKeys = dict((x, sortKey(x)) for x in files)
@@ -3856,7 +3944,7 @@ class Installer(object):
     def refreshSizeCrcDate(apRoot, old_sizeCrcDate, progress=None,
         removeEmpties=False, fullRefresh=False):
         """Update old_sizeCrcDate for root directory.
-		This is used both by InstallerProject's and by InstallersData."""
+        This is used both by InstallerProject's and by InstallersData."""
         rootIsMods = (
         apRoot == dirs['mods'])  # --Filtered scanning for mods directory.
         norm_ghost = (rootIsMods and Installer.getGhosted()) or {}
@@ -3881,7 +3969,8 @@ class Installer(object):
                 sDirs[:] = [x for x in sDirs if
                     x.lower() not in Installer.dataDirsMinus]
             dirDirsFiles.append((asDir, sDirs, sFiles))
-            if not (sDirs or sFiles): emptyDirs.add(GPath(asDir))
+            if not (sDirs or sFiles):
+                emptyDirs.add(GPath(asDir))
         progress(0, _("%s: Scanning...") % rootName)
         progress.setFull(1 + len(dirDirsFiles))
         for index, (asDir, sDirs, sFiles) in enumerate(dirDirsFiles):
@@ -3895,8 +3984,10 @@ class Installer(object):
                 ext = sFile[sFile.rfind('.'):].lower()
                 rpFile = rpDir.join(sFile)
                 if inModsRoot:
-                    if ext in skipExts: continue
-                    if not rsDir and sFile.lower() in bethFiles: continue
+                    if ext in skipExts:
+                        continue
+                    if not rsDir and sFile.lower() in bethFiles:
+                        continue
                     rpFile = ghost_norm.get(rpFile, rpFile)
                 isEspm = not rsDir and (ext == '.esp' or ext == '.esm')
                 apFile = apDir.join(sFile)
@@ -3915,7 +4006,8 @@ class Installer(object):
                 except OSError:
                     pass
         # --Force update?
-        if fullRefresh: pending |= set(new_sizeCrcDate)
+        if fullRefresh:
+            pending |= set(new_sizeCrcDate)
         changed = bool(pending) or (
         len(new_sizeCrcDate) != len(old_sizeCrcDate))
         # --Update crcs?
@@ -3998,7 +4090,7 @@ class Installer(object):
 
     def __copy__(self, iClass=None):
         """Create a copy of self -- works for subclasses too (assuming subclasses
-		don't add new data members). iClass argument is to support Installers.updateDictFile"""
+        don't add new data members). iClass argument is to support Installers.updateDictFile"""
         iClass = iClass or self.__class__
         clone = iClass(GPath(self.archive))
         copier = copy.copy
@@ -4010,7 +4102,7 @@ class Installer(object):
 
     def refreshDataSizeCrc(self):
         """Updates self.data_sizeCr and related variables.
-		Also, returns dest_src map for install operation."""
+        Also, returns dest_src map for install operation."""
         if isinstance(self, InstallerArchive):
             archiveRoot = GPath(self.archive).sroot
         else:
@@ -4048,7 +4140,8 @@ class Installer(object):
         espms = self.espms
         dest_src = {}
         # --Bad archive?
-        if type not in (1, 2): return dest_src
+        if type not in (1, 2):
+            return dest_src
         # --Scan over fileSizeCrcs
         for full, size, crc in self.fileSizeCrcs:
             file = full  # --Default
@@ -4095,7 +4188,8 @@ class Installer(object):
                     pDest = off_local[pFile]
                     dest = pDest.s
                 espms.add(pDest)
-                if pDest in espmNots: continue
+                if pDest in espmNots:
+                    continue
             # --Esp related voices (Oblivion)
             elif skipEspmVoices and fileLower[:12] == 'sound\\voice\\':
                 farPos = file.find('\\', 12)
@@ -4147,7 +4241,8 @@ class Installer(object):
 
         def fscSortKey(fsc):
             dirFile = fsc[0].lower().rsplit('\\', 1)
-            if len(dirFile) == 1: dirFile.insert(0, '')
+            if len(dirFile) == 1:
+                dirFile.insert(0, '')
             return dirFile
 
         fileSizeCrcs = self.fileSizeCrcs
@@ -4195,13 +4290,13 @@ class Installer(object):
 
     def refreshStatus(self, installers):
         """Updates missingFiles, mismatchedFiles and status.
-		Status:
-		20: installed (green)
-		10: mismatches (yellow)
-		0: unconfigured (white)
-		-10: missing files (red)
-		-20: bad type (grey)
-		"""
+        Status:
+        20: installed (green)
+        10: mismatches (yellow)
+        0: unconfigured (white)
+        -10: missing files (red)
+        -20: bad type (grey)
+        """
         data_sizeCrc = self.data_sizeCrc
         data_sizeCrcDate = installers.data_sizeCrcDate
         abnorm_sizeCrc = installers.abnorm_sizeCrc
@@ -4255,7 +4350,7 @@ class Installer(object):
 # ------------------------------------------------------------------------------
 class InstallerMarker(Installer):
     """Represents a marker installer entry.
-	Currently only used for the '==Last==' marker"""
+    Currently only used for the '==Last==' marker"""
     __slots__ = tuple()  # --No new slots
 
     def __init__(self, archive):
@@ -4307,7 +4402,7 @@ class InstallerArchive(Installer):
                     crc = int(value, 16)
                     if file and not isdir:
                         fileSizeCrcs.append((file, size, crc))
-                    # print '%08X %10d %s' % (crc,size,file)
+                        # print '%08X %10d %s' % (crc,size,file)
                     file = size = crc = isdir = 0
         result = ins.close()
         if result:
@@ -4316,10 +4411,10 @@ class InstallerArchive(Installer):
 
     def unpackToTemp(self, archive, fileNames, progress=None):
         """Erases all files from self.tempDir and then extracts specified files
-		from archive to self.tempDir.
-		fileNames: File names (not paths)."""
-        if not fileNames: raise ArgumentError(
-            _("No files to extract for %s.") % archive.s)
+        from archive to self.tempDir.
+        fileNames: File names (not paths)."""
+        if not fileNames:
+            raise ArgumentError(_("No files to extract for %s.") % archive.s)
         progress = progress or bolt.Progress()
         progress.state, progress.full = 0, len(fileNames)
         # --Dump file list
@@ -4356,7 +4451,8 @@ class InstallerArchive(Installer):
         dest_src = dict(
             (x, y) for x, y in self.refreshDataSizeCrc().iteritems() if
             x in destFiles)
-        if not dest_src: return 0
+        if not dest_src:
+            return 0
         # --Extract
         progress(0, archive.s + _("\nExtracting files..."))
         fileNames = [x[0] for x in dest_src.itervalues()]
@@ -4382,10 +4478,12 @@ class InstallerArchive(Installer):
         """Unpacks archive to build directory."""
         progress = progress or bolt.Progress()
         files = self.sortFiles([x[0] for x in self.fileSizeCrcs])
-        if not files: return 0
+        if not files:
+            return 0
         # --Clear Project
         destDir = dirs['installers'].join(project)
-        if destDir.exists(): destDir.rmtree(safety='Installers')
+        if destDir.exists():
+            destDir.rmtree(safety='Installers')
         # --Extract
         progress(0, project.s + _("\nExtracting files..."))
         self.unpackToTemp(archive, files, SubProgress(progress, 0, 0.9))
@@ -4413,8 +4511,10 @@ class InstallerProject(Installer):
         empties = set()
         projectDir = dirs['installers'].join(name)
         for asDir, sDirs, sFiles in os.walk(projectDir.s):
-            if not (sDirs or sFiles): empties.add(GPath(asDir))
-        for empty in empties: empty.removedirs()
+            if not (sDirs or sFiles):
+                empties.add(GPath(asDir))
+        for empty in empties:
+            empty.removedirs()
         projectDir.makedirs()  # --In case it just got wiped out.
 
     def refreshSource(self, archive, progress=None, fullRefresh=False):
@@ -4444,7 +4544,8 @@ class InstallerProject(Installer):
         dest_src = dict(
             (x, y) for x, y in self.refreshDataSizeCrc().iteritems() if
             x in destFiles)
-        if not dest_src: return 0
+        if not dest_src:
+            return 0
         # --Copy Files
         count = 0
         norm_ghost = Installer.getGhosted()
@@ -4466,7 +4567,8 @@ class InstallerProject(Installer):
         srcProj = tuple(
             (x, y) for x, y in self.refreshDataSizeCrc().iteritems() if
             x in projFiles)
-        if not srcProj: return (0, 0)
+        if not srcProj:
+            return (0, 0)
         # --Sync Files
         updated = removed = 0
         norm_ghost = Installer.getGhosted()
@@ -4488,7 +4590,7 @@ class InstallerProject(Installer):
 class InstallersData(bolt.TankData, DataDict):
     """Installers tank data. This is the data source for """
     status_color = {-20: 'grey', -10: 'red', 0: 'white', 10: 'orange',
-        20             : 'yellow', 30: 'green'}
+        20: 'yellow', 30: 'green'}
     type_textKey = {1: 'BLACK', 2: 'NAVY'}
 
     def __init__(self):
@@ -4503,10 +4605,10 @@ class InstallersData(bolt.TankData, DataDict):
         # --Default Params
         self.defaultParam('columns', self.tankColumns)
         self.defaultParam('colWidths', {
-            'Package' : 100, 'Package': 100, 'Order': 10, 'Group': 60,
+            'Package': 100, 'Package': 100, 'Order': 10, 'Group': 60,
             'Modified': 60, 'Size': 40, 'Files': 20})
         self.defaultParam('colAligns',
-            {'Order'      : 'RIGHT', 'Size': 'RIGHT', 'Files': 'RIGHT',
+            {'Order': 'RIGHT', 'Size': 'RIGHT', 'Files': 'RIGHT',
                 'Modified': 'RIGHT'})
         # --Persistent data
         self.dictFile = PickleDict(self.bashDir.join('Installers.dat'))
@@ -4527,7 +4629,8 @@ class InstallersData(bolt.TankData, DataDict):
     # -# Modified to avoid system error if installers path is not reachable.
     def refresh(self, progress=None, what='DIONS', fullRefresh=False):
         """Refresh info."""
-        if not os.access(dirs["installers"].s, os.W_OK): return "noDir"
+        if not os.access(dirs["installers"].s, os.W_OK):
+            return "noDir"
         progress = progress or bolt.Progress()
         # --MakeDirs
         self.bashDir.makedirs()
@@ -4554,18 +4657,25 @@ class InstallersData(bolt.TankData, DataDict):
             changed |= Installer.refreshSizeCrcDate(
                 dirs['mods'], self.data_sizeCrcDate, progress,
                 settings['bash.installers.removeEmptyDirs'], fullRefresh)
-        if 'I' in what: changed |= self.refreshRenamed()
-        if 'I' in what: changed |= self.refreshInstallers(progress, fullRefresh)
-        if 'O' in what or changed: changed |= self.refreshOrder()
-        if 'N' in what or changed: changed |= self.refreshNorm()
-        if 'S' in what or changed: changed |= self.refreshStatus()
+        if 'I' in what:
+            changed |= self.refreshRenamed()
+        if 'I' in what:
+            changed |= self.refreshInstallers(progress, fullRefresh)
+        if 'O' in what or changed:
+            changed |= self.refreshOrder()
+        if 'N' in what or changed:
+            changed |= self.refreshNorm()
+        if 'S' in what or changed:
+            changed |= self.refreshStatus()
         # --Done
-        if changed: self.hasChanged = True
+        if changed:
+            self.hasChanged = True
         return changed
 
     def updateDictFile(self):
         """Updates self.data to use new classes."""
-        if self.dictFile.vdata.get('version', 0): return
+        if self.dictFile.vdata.get('version', 0):
+            return
         # --Update to version 1
         for name in self.data.keys():
             installer = self.data[name]
@@ -4643,7 +4753,8 @@ class InstallersData(bolt.TankData, DataDict):
     def getColumns(self, item=None):
         """Returns text labels for item or for row header if item == None."""
         columns = self.getParam('columns')
-        if item == None: return columns[:]
+        if item == None:
+            return columns[:]
         labels, installer = [], self.data[item]
         for column in columns:
             if column == 'Package':
@@ -4703,7 +4814,8 @@ class InstallersData(bolt.TankData, DataDict):
     # --Dict Functions -----------------------------------------------------------
     def __delitem__(self, item):
         """Delete an installer. Delete entry AND archive file itself."""
-        if item == self.lastKey: return
+        if item == self.lastKey:
+            return
         installer = self.data[item]
         apath = self.dir.join(item)
         if isinstance(installer, InstallerProject):
@@ -4714,7 +4826,8 @@ class InstallersData(bolt.TankData, DataDict):
 
     def copy(self, item, destName, destDir=None):
         """Copies archive to new location."""
-        if item == self.lastKey: return
+        if item == self.lastKey:
+            return
         destDir = destDir or self.dir
         apath = self.dir.join(item)
         apath.copyTo(destDir.join(destName))
@@ -4738,12 +4851,14 @@ class InstallersData(bolt.TankData, DataDict):
             off_local = {}
             reader = bolt.CsvReader(pRenamed)
             for fields in reader:
-                if len(fields) < 2 or not fields[0] or not fields[1]: continue
+                if len(fields) < 2 or not fields[0] or not fields[1]:
+                    continue
                 off, local = map(string.strip, fields[:2])
-                if not reModExt.search(off) or not reModExt.search(
-                    local): continue
+                if not reModExt.search(off) or not reModExt.search(local):
+                    continue
                 off, local = map(GPath, (off, local))
-                if off != local: off_local[off] = local
+                if off != local:
+                    off_local[off] = local
             reader.close()
             changed = (off_local != Installer.off_local)
             Installer.off_local = off_local
@@ -4766,7 +4881,8 @@ class InstallersData(bolt.TankData, DataDict):
         for archive in dirs['installers'].list():
             apath = dirs['installers'].join(archive)
             isdir = apath.isdir()
-            if isdir: projects.add(archive)
+            if isdir:
+                projects.add(archive)
             if (isdir and archive != 'Bash') or archive.cext in (
             '.7z', '.zip', '.rar'):
                 installer = self.data.get(archive)
@@ -4779,14 +4895,16 @@ class InstallersData(bolt.TankData, DataDict):
                     pending.add(archive)
                 else:
                     newData[archive] = installer
-        if fullRefresh: pending |= set(newData)
+        if fullRefresh:
+            pending |= set(newData)
         changed = bool(pending) or (len(newData) != len(self.data))
         # --New/update crcs?
         for subPending, iClass in zip(
             (pending - projects, pending & projects),
             (InstallerArchive, InstallerProject)
         ):
-            if not subPending: continue
+            if not subPending:
+                continue
             progress(0, _("Scanning Packages..."))
             progress.setFull(len(subPending))
             for index, package in enumerate(sorted(subPending)):
@@ -4812,7 +4930,7 @@ class InstallersData(bolt.TankData, DataDict):
 
     def refreshInstallersNeeded(self):
         """Returns true if refreshInstallers is necessary. (Point is to skip use
-		of progress dialog when possible."""
+        of progress dialog when possible."""
         for archive in dirs['installers'].list():
             apath = dirs['installers'].join(archive)
             if not apath.isfile() or not archive.cext in (
@@ -4904,10 +5022,10 @@ class InstallersData(bolt.TankData, DataDict):
 
     def install(self, archives, progress=None, last=False, override=True):
         """Install selected archives.
-		what:
-			'MISSING': only missing files.
-			Otherwise: all (unmasked) files.
-		"""
+        what:
+            'MISSING': only missing files.
+            Otherwise: all (unmasked) files.
+        """
         progress = progress or bolt.Progress()
         # --Mask and/or reorder to last
         mask = set()
@@ -5006,9 +5124,9 @@ class InstallersData(bolt.TankData, DataDict):
 
     def anneal(self, anPackages=None, progress=None):
         """Anneal selected packages. If no packages are selected, anneal all.
-		Anneal will:
-		* Correct underrides in anPackages.
-		* Install missing files from active anPackages."""
+        Anneal will:
+        * Correct underrides in anPackages.
+        * Install missing files from active anPackages."""
         data = self.data
         data_sizeCrcDate = self.data_sizeCrcDate
         anPackages = set(anPackages or data)
@@ -5064,7 +5182,7 @@ class InstallersData(bolt.TankData, DataDict):
 
     def getConflictReport(self, srcInstaller, mode):
         """Returns report of overrides for specified package for display on conflicts tab.
-		mode: O: Overrides; U: Underrides"""
+        mode: O: Overrides; U: Underrides"""
         data = self.data
         srcOrder = srcInstaller.order
         conflictsMode = (mode == 'OVER')
@@ -5077,20 +5195,24 @@ class InstallersData(bolt.TankData, DataDict):
             'bash.installers.conflictsReport.showInactive']
         showLower = conflictsMode and settings[
             'bash.installers.conflictsReport.showLower']
-        if not mismatched: return ''
+        if not mismatched:
+            return ''
         src_sizeCrc = srcInstaller.data_sizeCrc
         packConflicts = []
         getArchiveOrder = lambda x: data[x].order
         for package in sorted(self.data, key=getArchiveOrder):
             installer = data[package]
-            if installer.order == srcOrder: continue
-            if not showInactive and not installer.isActive: continue
-            if not showLower and installer.order < srcOrder: continue
+            if installer.order == srcOrder:
+                continue
+            if not showInactive and not installer.isActive:
+                continue
+            if not showLower and installer.order < srcOrder:
+                continue
             curConflicts = Installer.sortFiles(
                 [x.s for x, y in installer.data_sizeCrc.iteritems()
                     if x in mismatched and y != src_sizeCrc[x]])
-            if curConflicts: packConflicts.append(
-                (installer.order, package.s, curConflicts))
+            if curConflicts:
+                packConflicts.append((installer.order, package.s, curConflicts))
         # --Unknowns
         isHigher = -1
         buff = cStringIO.StringIO()
@@ -5122,7 +5244,8 @@ class RefReplacer:
         self.newIds = {}  # --newIds[oldId] = (newId1,newId2...)
         self.newIndex = {}  # --newIndex[oldId] = Index of next newIds[oldId]
         self.usedIds = set()  # --Records to import
-        if filePath: self.loadText(filePath)
+        if filePath:
+            self.loadText(filePath)
 
     def loadText(self, filePath):
         """Loads replacer information from file."""
@@ -5143,7 +5266,8 @@ class RefReplacer:
                 self.srcModName = line
             elif mode == 'replace':
                 maReplace = reReplace.match(line)
-                if not maReplace: continue
+                if not maReplace:
+                    continue
                 oldId = maReplace.group(1)
                 self.newIds[oldId.lower()] = reNewIds.split(maReplace.group(2))
         ins.close()
@@ -5200,8 +5324,8 @@ class FileRep:
 
     def load(self, keepTypes='ALL', factory={}):
         """Load file. If keepTypes, then only keep records of type in keepTypes or factory.
-		factory: dictionary mapping record type to record class. For record types
-		in factory, specified class will be used and data will be kept."""
+        factory: dictionary mapping record type to record class. For record types
+        in factory, specified class will be used and data will be kept."""
         keepAll = (keepTypes == 'ALL')
         keepTypes = keepTypes or set()  # --Turns None or 0 into an empty set.
         # --Header
@@ -5250,9 +5374,9 @@ class FileRep:
 
     def getRecord(self, type, id, Class=None):
         """Gets record with corresponding type and id.
-		If record doesn't exist and Class is provided, then a new instance
-		with given id is created, added to record list and indexed and then
-		returned to the caller."""
+        If record doesn't exist and Class is provided, then a new instance
+        with given id is created, added to record list and indexed and then
+        returned to the caller."""
         idLower = id.lower()
         typeIds = self.indexed[type]
         if idLower in typeIds:
@@ -5291,9 +5415,8 @@ class FileRep:
 
     def save(self, outPath=None):
         """Save data to file.
-		outPath -- Path of the output file to write to. Defaults to original file path."""
-        if (not self.canSave): raise StateError(
-            _("Insufficient data to write file."))
+        outPath -- Path of the output file to write to. Defaults to original file path."""
+        if (not self.canSave): raise StateError(_("Insufficient data to write file."))
         if not outPath:
             fileInfo = self.fileInfo
             outPath = os.path.join(fileInfo.dir, fileInfo.name)
@@ -5318,7 +5441,8 @@ class FileRep:
         typeOrder = {}
         for typeIncrement in listFromLines(mush.recordTypes):
             (type, increment) = typeIncrement.split()
-            if increment == '+': order += 1
+            if increment == '+':
+                order += 1
             typeOrder[type] = order
         # --Get ids for records. (For subsorting.)
         ids = {}
@@ -5338,7 +5462,7 @@ class FileRep:
 # ------------------------------------------------------------------------------
 class FileRefs(FileRep):
     """TES3 file representation with primary focus on references, but also
-	including other information used in file repair."""
+    including other information used in file repair."""
 
     def __init__(self, fileInfo, skipNonCells=False, skipObjRecords=False,
         log=None, progress=None):
@@ -5364,7 +5488,7 @@ class FileRefs(FileRep):
     # --File Handling---------------------------------------
     def setDebrisIds(self):
         """Setup to record ids to be used by WorldRefs.removeSaveDebris.
-		Should be called before load or refresh."""
+        Should be called before load or refresh."""
         for type in ['BOOK', 'CREA', 'GLOB', 'NPC_', 'LEVI', 'LEVC', 'FACT']:
             if type not in self.debrisIds:
                 self.debrisIds[type] = []
@@ -5415,7 +5539,8 @@ class FileRefs(FileRep):
         ins = Tes3Reader(self.fileInfo.name, file(inPath, 'rb'))
         (name, size, delFlag, recFlag) = ins.unpackRecHeader()
         self.tes3 = Tes3(name, size, delFlag, recFlag, ins, True)
-        if not canSave: del self.tes3.others[:]
+        if not canSave:
+            del self.tes3.others[:]
         # --Progress info
         progress = self.progress
         progress(0.0, 'Loading ' + self.fileInfo.name)
@@ -5429,7 +5554,8 @@ class FileRefs(FileRep):
                 record = Cell(name, size, delFlag, recFlag, ins, 0,
                     skipObjRecords)
                 cells.append(record)
-                if canSave: records.append(record)
+                if canSave:
+                    records.append(record)
             # --Contents
             elif canSave and name in contTypes:
                 if name == 'CREC':
@@ -5490,9 +5616,9 @@ class FileRefs(FileRep):
 
     def save(self, outPath=None):
         """Save data to file.
-		outPath -- Path of the output file to write to. Defaults to original file path."""
-        if (not self.canSave or self.skipObjRecords): raise StateError(
-            _("Insufficient data to write file."))
+        outPath -- Path of the output file to write to. Defaults to original file path."""
+        if (not self.canSave or self.skipObjRecords):
+            raise StateError(_("Insufficient data to write file."))
         if not outPath:
             fileInfo = self.fileInfo
             outPath = os.path.join(fileInfo.dir, fileInfo.name)
@@ -5523,8 +5649,8 @@ class FileRefs(FileRep):
     # --Renumbering-------------------------------------------------------------
     def getFirstObjectIndex(self):
         """Returns first object index number. Assumes that references are in linear order."""
-        if not self.fileInfo.isEsp(): raise StateError(
-            _('FileRefs.renumberObjects is for esps only.'))
+        if not self.fileInfo.isEsp():
+            raise StateError(_('FileRefs.renumberObjects is for esps only.'))
         for cell in self.cells:
             objects = cell.getObjects()
             for object in objects.list():
@@ -5534,11 +5660,11 @@ class FileRefs(FileRep):
 
     def renumberObjects(self, first):
         """Offsets all local object index numbers by specified amount. FOR ESPS ONLY!
-		Returns number of objects changed."""
-        if not self.fileInfo.isEsp(): raise StateError(
-            _('FileRefs.renumberObjects is for esps only.'))
-        if first <= 0: raise ArgumentError(
-            _('First index should be a positive integer'))
+        Returns number of objects changed."""
+        if not self.fileInfo.isEsp():
+            raise StateError(_('FileRefs.renumberObjects is for esps only.'))
+        if first <= 0:
+            raise ArgumentError(_('First index should be a positive integer'))
         log = self.log
         next = int(first)
         for cell in self.cells:
@@ -5553,9 +5679,9 @@ class FileRefs(FileRep):
     # --Remapping---------------------------------------------------------------
     def remap(self, newMasters, modMap, objMaps=[]):
         """Remap masters and modIndexes.
-		newMasters -- New master list. Same format as Cell.masters.
-		modMap -- mapping dictionary so that newModIndex = modMap[oldModIndex]
-		objMaps -- ObjectIndex mapping dictionaries"""
+        newMasters -- New master list. Same format as Cell.masters.
+        modMap -- mapping dictionary so that newModIndex = modMap[oldModIndex]
+        objMaps -- ObjectIndex mapping dictionaries"""
         # --Masters
         self.tes3.masters = newMasters
         # --File mapping
@@ -5569,7 +5695,8 @@ class FileRefs(FileRep):
                 cellObjMap = objMap[cellId]
                 # --Save
                 cell = cells_id.get(cellId)
-                if not cell: continue
+                if not cell:
+                    continue
                 # --Objects
                 objects = cell.getObjects()
                 for object in objects.list():
@@ -5599,7 +5726,8 @@ class FileRefs(FileRep):
                             objects.replace(object, newObject)
         self.updateScptRefs()
         # --Remap iMods
-        if not modMapKeys: return
+        if not modMapKeys:
+            return
         for cell in self.cells:
             objects = cell.getObjects()
             for object in objects.list():
@@ -5620,7 +5748,8 @@ class FileRefs(FileRep):
     def remapObject(self, object, newIMod, newIObj=-1):
         """Returns an object mapped to a newMod."""
         (iMod, iObj, objId, objRecords) = object[:4]
-        if newIObj == -1: newIObj = iObj
+        if newIObj == -1:
+            newIObj = iObj
         newObject = (newIMod, newIObj) + object[2:]
         if objRecords and objRecords[0].name == 'MVRF':
             data = cStringIO.StringIO()
@@ -5629,7 +5758,7 @@ class FileRefs(FileRep):
             objRecords[0].data = data.getvalue()
             objRecords[0].setChanged(False)
             data.close()
-        # print 'Remapped MVRF:',newObject[:3]
+            # print 'Remapped MVRF:',newObject[:3]
         # --Remap any script references
         oldRef = (iMod, iObj)
         if oldRef in self.scptRefs:
@@ -5638,8 +5767,8 @@ class FileRefs(FileRep):
                 if self.refs_scpt[scpt] == oldRef:
                     scpt.setRef(newRef)
                     self.refs_scpt[scpt] = newRef
-                # print object[:3],newRef, scpt.id
-                # --Be sure to call updateScptRefs when finished remapping *all* objects.
+                    # print object[:3],newRef, scpt.id
+                    # --Be sure to call updateScptRefs when finished remapping *all* objects.
         # --Done
         return newObject
 
@@ -5651,10 +5780,12 @@ class FileRefs(FileRep):
 
     def listBadRefScripts(self):
         """Logs any scripts with bad refs."""
-        if not self.log: return
+        if not self.log:
+            return
         ids = []
         for record in self.records:
-            if record.name != 'SCPT': continue
+            if record.name != 'SCPT':
+                continue
             rnam = record.rnam
             if rnam and rnam.data == chr(255) * 4:
                 ids.append(record.getId())
@@ -5666,7 +5797,7 @@ class FileRefs(FileRep):
     def getObjectMap(self, oldRefs):
         """Returns an iObj remapping from an old FileRefs to this FileRefs.
 
-		This is used to update saved games from one version of a mod to a newer version."""
+        This is used to update saved games from one version of a mod to a newer version."""
         objMap = {}  # --objMap[cellId][oldIObj] = newIObj
         # --Old cells
         for oldCell in oldRefs.cells:
@@ -5682,14 +5813,16 @@ class FileRefs(FileRep):
             # --Old Objects
             for oldObject in oldCell.getObjects().list():
                 (iMod, oldIObj, objId) = oldObject[:3]
-                if iMod: continue  # --Skip mods to masters
+                if iMod:
+                    continue  # --Skip mods to masters
                 # --New Objects
                 objIndex = nextObjectIndex.get(objId, 0)
                 newIObj = -1  # --Delete by default
                 while objIndex < len(newObjects):
                     newObject = newObjects[objIndex]
                     objIndex += 1
-                    if newObject[0]: continue  # --Skip mods to masters
+                    if newObject[0]:
+                        continue  # --Skip mods to masters
                     if newObject[2] == objId:
                         newIObj = newObject[1]
                         break
@@ -5698,14 +5831,15 @@ class FileRefs(FileRep):
                 if newIObj != oldIObj:
                     cellObjMap[oldIObj] = (newIObj, objId)
             # --Save mapping for this cell?
-            if cellObjMap: objMap[cellId] = cellObjMap
+            if cellObjMap:
+                objMap[cellId] = cellObjMap
         # --Done
         return objMap
 
     # --Removers ---------------------------------------------------------------
     def removeLvcrs(self):
         """Remove all LVCR refs.
-		In save game, effect is to reset the spawn point."""
+        In save game, effect is to reset the spawn point."""
         count = 0
         for cell in self.cells:
             # print cell.getId()
@@ -5754,8 +5888,8 @@ class FileRefs(FileRep):
 
     def removeRefsById(self, objIds, safeCells=[]):
         """Remove refs with specified object ids, except in specified cells.
-		objIds -- Set of object ids to re removed.
-		skipCells -- Set of cell names to be skipped over."""
+        objIds -- Set of object ids to re removed.
+        skipCells -- Set of cell names to be skipped over."""
         reObjNum = re.compile('[0-9A-F]{8}$')
         delCount = {}
         reSafeCells = re.compile('(' + ('|'.join(safeCells)) + ')')
@@ -5872,8 +6006,8 @@ class WorldRefs:
             totSize += size
         cumSize = 0
         for (masterName, size) in proItems:
-            if size: self.progress.setBaseScale(1.0 * cumSize / totSize,
-                1.0 * size / totSize)
+            if size:
+                self.progress.setBaseScale(1.0 * cumSize / totSize, 1.0 * size / totSize)
             self.addMaster(masterName)
             cumSize += size
 
@@ -5930,7 +6064,7 @@ class WorldRefs:
                             masterInfo.masterNames[iMMod - 1])
                     del refIds[oldIdKey]
                     refAlts[altKey] = newIdKey
-                # print cellId, newIdKey, objId
+                    # print cellId, newIdKey, objId
                 # --Save it
                 refIds[newIdKey] = objId
             # --Progress
@@ -5986,7 +6120,7 @@ class WorldRefs:
 
     def removeDebrisRecords(self, fileRefs):
         """Removes debris records (BOOK, CREA, GLOB, NPC_) that are not present
-		in masters and that aren't constructed in game (custom enchantment scrolls)."""
+        in masters and that aren't constructed in game (custom enchantment scrolls)."""
         # --Make sure fileRefs for a save file!
         if not fileRefs.fileInfo.isEss():
             fileName = fileRefs.fileInfo.fileName
@@ -6025,7 +6159,7 @@ class WorldRefs:
 
     def removeOverLists(self, fileRefs):
         """Removes leveled lists when more than one loaded mod changes that
-		same leveled list."""
+        same leveled list."""
         if not fileRefs.fileInfo.isEss():
             fileName = fileRefs.fileInfo.fileName
             raise ArgumentError(_(
@@ -6146,7 +6280,8 @@ class WorldRefs:
                         refMods[key] = iMod
                 # --Remove remaps for any repeated keys
                 for key in repeatedKeys:
-                    if key in refMods: del refMods[key]
+                    if key in refMods:
+                        del refMods[key]
                 # --Try to remap
                 for object in badObjects:
                     (iMod, iObj, objId) = object[:3]
@@ -6175,7 +6310,8 @@ class WorldRefs:
 
     def repairWorldMap(self, fileRefs, gridLines=True):
         """Repair savegame's world map."""
-        if not fileRefs.fmap: return 0
+        if not fileRefs.fmap:
+            return 0
         progress = self.progress
         progress.setMax((28 * 2) ** 2)
         progress(0.0, _("Drawing Cells"))
@@ -6197,8 +6333,8 @@ class WorldRefs:
 class FileDials(FileRep):
     """TES3 file representation focussing on dialog.
 
-	Only TES3 DIAL and INFO records are analyzed. All others are left in raw data
-	form. """
+    Only TES3 DIAL and INFO records are analyzed. All others are left in raw data
+    form. """
 
     def __init__(self, fileInfo, canSave=True):
         FileRep.__init__(self, fileInfo, canSave)
@@ -6223,7 +6359,8 @@ class FileDials(FileRep):
             if name == 'DIAL':
                 dial = Dial(name, size, delFlag, recFlag, ins, True)
                 self.dials.append(dial)
-                if canSave: self.records.append(dial)
+                if canSave:
+                    self.records.append(dial)
             # --INFO?
             elif name == 'INFO':
                 info = InfoClass(name, size, delFlag, recFlag, ins, True)
@@ -6241,9 +6378,9 @@ class FileDials(FileRep):
 
     def save(self, outPath=None):
         """Save data to file.
-		outPath -- Path of the output file to write to. Defaults to original file path."""
-        if (not self.canSave): raise StateError(
-            _("Insufficient data to write file."))
+        outPath -- Path of the output file to write to. Defaults to original file path."""
+        if (not self.canSave):
+            raise StateError(_("Insufficient data to write file."))
         FileRep.save(self, outPath)
 
     def loadText(self, textFileName):
@@ -6263,7 +6400,8 @@ class FileDials(FileRep):
         # --Read file
         textFile = file(textFileName, 'rb')
         for line in textFile:
-            if reHeader.match(line): continue
+            if reHeader.match(line):
+                continue
             maInfo = reInfo.match(line)
             if maInfo:
                 infoKey = (
@@ -6333,9 +6471,11 @@ class FileDials(FileRep):
         for infoKey in infoKeys:
             info = self.infos[infoKey]
             # --Filter by spId?
-            if spId and info.spId != spId: continue
+            if spId and info.spId != spId:
+                continue
             # --Empty text?
-            if not info.text: continue
+            if not info.text:
+                continue
             # --NPC Header?
             if groupBy == 'spId' and info.spId != prevSpId:
                 prevSpId = info.spId
@@ -6362,7 +6502,7 @@ class FileDials(FileRep):
 # ------------------------------------------------------------------------------
 class FileLibrary(FileRep):
     """File representation for generating library books.
-	Generates library books from input text file and current mod load list."""
+    Generates library books from input text file and current mod load list."""
 
     def __init__(self, fileInfo, canSave=True, log=None, progress=None):
         """Initialize."""
@@ -6387,7 +6527,8 @@ class FileLibrary(FileRep):
             line = reComment.sub('', line)
             line = line.rstrip()
             # --Skip empty/comment lines
-            if not line: continue
+            if not line:
+                continue
             # --Parse line
             (libId, srcId, altId) = line.split('\t')[:3]
             self.libList.append(libId)
@@ -6495,7 +6636,8 @@ class FileLibrary(FileRep):
             tempObjects = cell.tempObjects = []
             for index, libId in enumerate(self.libList):
                 srcId = self.libMap[libId][0]
-                if srcId not in self.srcBooks: continue
+                if srcId not in self.srcBooks:
+                    continue
                 srData = SubRecord('DATA', 24)
                 srData.setData(
                     struct.pack('6f', index * dx, index * dy, 100, rx, ry, rz))
@@ -6517,8 +6659,8 @@ class FileLibrary(FileRep):
 class FileLists(FileRep):
     """TES3 file representation focussing on levelled lists.
 
-	Only TES3 LEVI and LEVC records are analyzed. All others are left in raw data
-	form. """
+    Only TES3 LEVI and LEVC records are analyzed. All others are left in raw data
+    form. """
 
     def __init__(self, fileInfo, canSave=True):
         FileRep.__init__(self, fileInfo, canSave)
@@ -6542,13 +6684,15 @@ class FileLists(FileRep):
             if name == 'LEVC':
                 levc = Levc(name, size, delFlag, recFlag, ins, True)
                 self.levcs[levc.id] = levc
-                if canSave: self.records.append(levc)
-            # print '  Added:',levc.id
+                if canSave:
+                    self.records.append(levc)
+                # print '  Added:',levc.id
             elif name == 'LEVI':
                 levi = Levi(name, size, delFlag, recFlag, ins, True)
                 self.levis[levi.id] = levi
-                if canSave: self.records.append(levi)
-            # print '  Added:',levi.id
+                if canSave:
+                    self.records.append(levi)
+                # print '  Added:',levi.id
             # --Other
             elif canSave:
                 record = Record(name, size, delFlag, recFlag, ins)
@@ -6594,7 +6738,8 @@ class FileLists(FileRep):
         # --Log
         log = self.log
         for label, levls in (('Creature', self.levcs), ('Item', self.levis)):
-            if not len(levls): continue
+            if not len(levls):
+                continue
             log.setHeader(_('Merged %s Lists:') % (label,))
             for listId in sorted(levls.keys(), key=lambda a: a.lower()):
                 log(listId)
@@ -6605,7 +6750,7 @@ class FileLists(FileRep):
 # ------------------------------------------------------------------------------
 class FileScripts(FileRep):
     """TES3 file representation focussing on scripts. Only scripts are analyzed.
-	All other recods are left in raw data form."""
+    All other recods are left in raw data form."""
 
     def __init__(self, fileInfo, canSave=True):
         FileRep.__init__(self, fileInfo, canSave)
@@ -6628,7 +6773,8 @@ class FileScripts(FileRep):
             if name == 'SCPT':
                 record = Scpt(name, size, delFlag, recFlag, ins, True)
                 self.scripts.append(record)
-                if canSave: self.records.append(record)
+                if canSave:
+                    self.records.append(record)
             # --Non-dials?
             elif canSave:
                 record = Record(name, size, delFlag, recFlag, ins)
@@ -6640,9 +6786,9 @@ class FileScripts(FileRep):
 
     def save(self, outPath=None):
         """Save data to file.
-		outPath -- Path of the output file to write to. Defaults to original file path."""
-        if (not self.canSave): raise StateError(
-            _("Insufficient data to write file."))
+        outPath -- Path of the output file to write to. Defaults to original file path."""
+        if (not self.canSave):
+            raise StateError(_("Insufficient data to write file."))
         FileRep.save(self, outPath)
 
     def loadText(self, textFileName):
@@ -6856,15 +7002,16 @@ class ScheduleGenerator:
         # --Functions/Translators
         replDef = lambda a: defs[a.group(1)]
         # --0: awake, 1: sleep+trespass, 2: sleep 3: dim trespass
-        sleepStates = {'=': None, '-': 0, '+': 1, '*': 2, '^': 3, '~': 4,
-            'x'           : 5}
+        sleepStates = {'=': None, '-': 0, '+': 1, '*': 2, '^': 3, '~': 4, 'x': 5}
         # --Log
         header = os.path.split(fileName)[-1]
-        if len(header) < 70: header += '=' * (70 - len(header))
+        if len(header) < 70:
+            header += '=' * (70 - len(header))
         log.setHeader(header)
         # --Imported
         isTopFile = (imported == None)
-        if isTopFile: imported = []
+        if isTopFile:
+            imported = []
         # --Input variables
         section = None
         town = None
@@ -6881,7 +7028,8 @@ class ScheduleGenerator:
             line = reComment.sub('', line)
             line = line.rstrip()
             # --Skip empty/comment lines
-            if not line: continue
+            if not line:
+                continue
             # --Section header?
             if line[0] == '@':
                 # (town|defs|night|code|npcName)[: npcCondition]
@@ -6965,7 +7113,8 @@ class ScheduleGenerator:
                     line = reDef.sub(replDef, line)
                     chunks = [chunk.strip() for chunk in line.split(';')]
                     maSleep = reSleep.match(chunks[0])
-                    if not maSleep: continue
+                    if not maSleep:
+                        continue
                     (cell, defaultState) = (
                     maSleep.group(2), sleepStates[maSleep.group(1)])
                     cellStates = (defaultState,)
@@ -7071,22 +7220,27 @@ class ScheduleGenerator:
             recIndex += 1
             if isinstance(record, Dial):
                 record.load(unpack=True)
-                if record.type == 1 and record.id == 'Hello': break
+                if record.type == 1 and record.id == 'Hello':
+                    break
         # --Sub scripts into hello entries
         reSCInit = re.compile(r'^;--SC_INIT: +(\w+)', re.M)
         while recIndex < len(records):
             record = records[recIndex]
             recIndex += 1
-            if record.name != 'INFO': break
+            if record.name != 'INFO':
+                break
             record.load(unpack=True)
             script = record.script
-            if not script: continue
+            if not script:
+                continue
             maSCInit = reSCInit.search(script)
             # --No SCInit marker in script?
-            if not maSCInit: continue
+            if not maSCInit:
+                continue
             town = maSCInit.group(1)
             # --SCInit for uncovered town?
-            if town not in self.newTowns: continue
+            if town not in self.newTowns:
+                continue
             # --Truncate script and add npc initializers
             script = script[:maSCInit.end()]
             for npc in sorted(self.schedule[town].keys()):
@@ -7102,7 +7256,8 @@ class ScheduleGenerator:
 
     def getResetScript(self):
         """Return SC_[Project]_ResetGS script."""
-        if not self.project: raise StateError(_('No project has been defined!'))
+        if not self.project:
+            raise StateError(_('No project has been defined!'))
         text = self.tsReset0.substitute(project=self.project)
         for town in sorted(self.schedule.keys()):
             text += self.tsReset1.substitute(town=town)
@@ -7111,7 +7266,8 @@ class ScheduleGenerator:
 
     def getResetStatesScript(self):
         """Return SC_[Project]_ResetStatesGS script."""
-        if not self.project: raise StateError(_('No project has been defined!'))
+        if not self.project:
+            raise StateError(_('No project has been defined!'))
         text = "begin SC_%s_ResetStatesGS\n" % (self.project,)
         text += ';--Sets state variables for %s project to zero.\n' % (
         self.project,)
@@ -7143,7 +7299,8 @@ class ScheduleGenerator:
                 cellStates = tcSleep[cell]
                 defaultState = cellStates[0]
                 out.write('elseif ( getPCCell %s )\n' % (cell,))
-                if defaultState == None: continue
+                if defaultState == None:
+                    continue
                 for count, (condition, state) in enumerate(cellStates[1:]):
                     ifString = ['if', 'elseif'][count > 0]
                     out.write('\t%s ( %s )\n\t\tset SC_Sleep to %s\n' % (
