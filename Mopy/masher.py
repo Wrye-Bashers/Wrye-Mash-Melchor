@@ -11,9 +11,8 @@
 # --Localization
 # ..Handled by mosh, so import that.
 import mosh
-from mosh import _
-from mosh import AbstractError, ArgumentError, StateError, UncodedError
-from mosh import formatInteger, formatDate
+from mosh import _, AbstractError, ArgumentError, StateError, UncodedError, \
+    formatInteger, formatDate
 
 bosh = mosh  # --Cheap compatibility for imported code.
 
@@ -39,13 +38,10 @@ from wx.lib.evtmgr import eventManager
 
 # --Balt
 import balt
-from balt import tooltip, fill, bell
-from balt import bitmapButton, button, toggleButton, checkBox, staticText, \
-    spinCtrl
-from balt import leftSash, topSash
-from balt import spacer, hSizer, vSizer, hsbSizer, vsbSizer
-from balt import colors, images, Image
-from balt import Links, Link, SeparatorLink, MenuLink
+from balt import tooltip, fill, bell, bitmapButton, button, toggleButton, \
+    checkBox, staticText, spinCtrl, leftSash, topSash, spacer, hSizer, \
+    vSizer, hsbSizer, vsbSizer, colors, images, Image, Links, Link, \
+    SeparatorLink, MenuLink
 
 # --Internet Explorer
 #  - Make sure that python root directory is in PATH, so can access dll's.
