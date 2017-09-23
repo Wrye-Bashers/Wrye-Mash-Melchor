@@ -32,6 +32,7 @@ from types import *
 import bolt
 from bolt import LString, GPath, SubProgress
 
+# --wxPython
 import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.evtmgr import eventManager
@@ -338,7 +339,7 @@ ID_PROFILES = IdList(10500, 90, 'EDIT')
 # Message Dialogs -------------------------------------------------------------
 def Message(parent, message, title='', style=wx.OK):
     """Shows a modal MessageDialog.
-	Use ErrorMessage, WarningMessage or InfoMessage."""
+    Use ErrorMessage, WarningMessage or InfoMessage."""
     dialog = wx.MessageDialog(parent, message, title, style)
     result = dialog.ShowModal()
     dialog.Destroy()
@@ -378,8 +379,7 @@ def LogMessage(parent, message, logText, title='', style=0, asDialog=True):
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
     else:
         window = wx.Frame(parent, -1, title, pos=pos, size=(200, 300),
-            style=(
-            wx.RESIZE_BORDER | wx.CAPTION | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CLIP_CHILDREN))
+            style=(wx.RESIZE_BORDER | wx.CAPTION | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CLIP_CHILDREN))
         window.SetIcons(images['mash.icons2'].GetIconBundle())
     window.SetSizeHints(200, 200)
     sizer = wx.BoxSizer(wx.VERTICAL)
@@ -402,9 +402,10 @@ def LogMessage(parent, message, logText, title='', style=0, asDialog=True):
 
 def ContinueQuery(parent, message, continueKey, title=_('Warning')):
     """Shows a modal continue query if value of continueKey is false. Returns True to continue.
-	Also provides checkbox "Don't show this in future." to set continueKey to true."""
+    Also provides checkbox "Don't show this in future." to set continueKey to true."""
     # --ContinueKey set?
-    if settings.get(continueKey): return wx.ID_OK
+    if settings.get(continueKey):
+        return wx.ID_OK
     # --Generate/show dialog
     dialog = wx.Dialog(parent, -1, title, size=(350, 200),
         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
@@ -527,15 +528,11 @@ class Checkboxes(balt.ImageList):
 installercons = balt.ImageList(16, 16)
 installercons.data.extend({
     # --Off/Archive
-    'off.green'     : Image(r'images/checkbox_green_off.png',
-        wx.BITMAP_TYPE_PNG),
-    'off.grey'      : Image(r'images/checkbox_grey_off.png',
-        wx.BITMAP_TYPE_PNG),
+    'off.green'     : Image(r'images/checkbox_green_off.png', wx.BITMAP_TYPE_PNG),
+    'off.grey'      : Image(r'images/checkbox_grey_off.png', wx.BITMAP_TYPE_PNG),
     'off.red'       : Image(r'images/checkbox_red_off.png', wx.BITMAP_TYPE_PNG),
-    'off.white'     : Image(r'images/checkbox_white_off.png',
-        wx.BITMAP_TYPE_PNG),
-    'off.orange'    : Image(r'images/checkbox_orange_off.png',
-        wx.BITMAP_TYPE_PNG),
+    'off.white'     : Image(r'images/checkbox_white_off.png', wx.BITMAP_TYPE_PNG),
+    'off.orange'    : Image(r'images/checkbox_orange_off.png', wx.BITMAP_TYPE_PNG),
     'off.yellow'    : Image(r'images/checkbox_yellow_off.png',
         wx.BITMAP_TYPE_PNG),
     # --On/Archive
@@ -588,7 +585,7 @@ class NotebookPanel(wx.Panel):
 
     def OnShow(self):
         """To be called when particular panel is changed to and/or shown for first time.
-		Default version does nothing, but derived versions might update data."""
+        Default version does nothing, but derived versions might update data."""
         self.SetStatusCount()
 
     def OnCloseWindow(self):
@@ -758,7 +755,7 @@ class ListEditorDialog(wx.Dialog):
             self.data.check(item)
         else:
             self.data.uncheck(item)
-        # self.list.SetSelection(index)
+            # self.list.SetSelection(index)
 
     # --List Commands
     def DoAdd(self, event):
@@ -808,7 +805,8 @@ class ListEditorDialog(wx.Dialog):
         # --Data
         itemDex = selections[0]
         item = self.items[itemDex]
-        if not self.data.remove(item): return
+        if not self.data.remove(item):
+            return
         # --GUI
         del self.items[itemDex]
         self.list.Delete(itemDex)
@@ -816,7 +814,7 @@ class ListEditorDialog(wx.Dialog):
     # --Window Closing
     def OnCloseWindow(self, event):
         """Handle window close event.
-		Remember window size, position, etc."""
+        Remember window size, position, etc."""
         sizes = settings.getChanged('mash.window.sizes')
         sizes[self.data.__class__] = self.GetSizeTuple()
         self.Destroy()
@@ -887,7 +885,8 @@ class List(wx.Panel):
             self.sortDirty = 0
             (col, reverse) = (None, -1)
         # --Items to select afterwards. (Defaults to current selection.)
-        if selected == 'SAME': selected = set(self.GetSelected())
+        if selected == 'SAME':
+            selected = set(self.GetSelected())
         # --Reget items
         self.GetItems()
         self.SortItems(col, reverse)
@@ -908,7 +907,8 @@ class List(wx.Panel):
     def GetSelected(self):
         """Return list of items selected (hilighted) in the interface."""
         # --No items?
-        if not 'items' in self.__dict__: return []
+        if not 'items' in self.__dict__:
+            return []
         selected = []
         itemDex = -1
         while True:
@@ -936,16 +936,16 @@ class List(wx.Panel):
 
     def GetSortSettings(self, col, reverse):
         """Return parsed col, reverse arguments. Used by SortSettings.
-		col: sort variable.
-		Defaults to last sort. (self.sort)
-		reverse: sort order
-		1: Descending order
-		0: Ascending order
-		-1: Use current reverse settings for sort variable, unless
-			last sort was on same sort variable -- in which case,
-			reverse the sort order.
-		-2: Use current reverse setting for sort variable.
-		"""
+        col: sort variable.
+          Defaults to last sort. (self.sort)
+        reverse: sort order
+          1: Descending order
+          0: Ascending order
+         -1: Use current reverse settings for sort variable, unless
+             last sort was on same sort variable -- in which case,
+             reverse the sort order.
+         -2: Use current reverse setting for sort variable.
+        """
         # --Sort Column
         if not col:
             col = self.sort
@@ -965,7 +965,8 @@ class List(wx.Panel):
     # --Event Handlers -------------------------------------
     # --Column Menu
     def DoColumnMenu(self, event):
-        if not self.mainMenu: return
+        if not self.mainMenu:
+            return
         # --Build Menu
         column = event.GetColumn()
         menu = wx.Menu()
@@ -986,7 +987,8 @@ class List(wx.Panel):
     # --Item Menu
     def DoItemMenu(self, event):
         selected = self.GetSelected()
-        if not selected: return
+        if not selected:
+            return
         # --Build Menu
         menu = wx.Menu()
         for link in self.itemMenu:
@@ -1055,8 +1057,7 @@ class MasterList(List):
             masterInfo.setName(newName)
             if newName not in self.newMasters:
                 self.newMasters.append(newName)
-            if (oldName in self.newMasters) and (
-            not self.getMasterInfos(oldName)):
+            if (oldName in self.newMasters) and (not self.getMasterInfos(oldName)):
                 self.newMasters.remove(oldName)
             if newName not in self.allMasters:
                 self.allMasters.append(newName)
@@ -1112,8 +1113,7 @@ class MasterList(List):
             return status
         newIndex = self.newMasters.index(masterName)
         mwIniLoadOrder = mosh.mwIniFile.loadOrder
-        if (not self.edited) and (
-            newIndex != self.oldMasters.index(masterName)):
+        if (not self.edited) and (newIndex != self.oldMasters.index(masterName)):
             return 20
         elif status > 0 or self.fileIsMod:
             return status
@@ -1170,8 +1170,7 @@ class MasterList(List):
         status = self.GetMasterStatus(itemId)
         on = masterInfo.isLoaded
         self.list.SetItemImage(itemDex, self.checkboxes.Get(status, on))
-
-    # --Selection State [NOT USED]
+        # --Selection State [NOT USED]
 
     # --Sort Items
     def SortItems(self, col=None, reverse=-2):
@@ -1205,7 +1204,8 @@ class MasterList(List):
         else:
             raise MashError, _('Unrecognized sort key: ') + col
         # --Ascending
-        if reverse: self.items.reverse()
+        if reverse:
+            self.items.reverse()
         # --ESMs First?
         settings['mash.masters.esmsFirst'] = self.esmsFirst
         if self.esmsFirst or col == 'Load Order':
@@ -1287,7 +1287,8 @@ class MasterList(List):
         # --Unselect dependents
         for itemId in self.items:
             otherMasterInfo = self.data[itemId]
-            if not otherMasterInfo.isLoaded: continue
+            if not otherMasterInfo.isLoaded:
+                continue
             if masterName in otherMasterInfo.masterNames:
                 self.unload(otherMasterInfo.name)
 
@@ -1316,8 +1317,7 @@ class MasterList(List):
                 else:
                     # self.unload(masterName)
                     masterInfo.isLoaded = False
-                if masterName in self.newMasters: self.newMasters.remove(
-                    masterName)
+                if masterName in self.newMasters: self.newMasters.remove(masterName)
             # --Fix size
             if masterInfo.modInfo:
                 masterInfo.size = masterInfo.modInfo.size
@@ -1335,7 +1335,8 @@ class MasterList(List):
 
     # --Column Menu
     def DoColumnMenu(self, event):
-        if not self.fileInfo: return
+        if not self.fileInfo:
+            return
         List.DoColumnMenu(self, event)
 
     # --Item Menu
@@ -1451,8 +1452,7 @@ class ModList(List):
         self.list.Bind(wx.EVT_LEFT_DCLICK, self.OnDoubleClick)
         # $# from FallenWizard
         self.list.Bind(wx.EVT_CHAR, self.OnChar)
-
-    # $#
+        # $#
 
     def Refresh(self, files='ALL', detail='SAME'):
         """Refreshes UI for specified file. Also calls saveList.Refresh()!"""
@@ -1562,7 +1562,8 @@ class ModList(List):
         else:
             raise MashError, _('Unrecognized sort key: ') + col
         # --Ascending
-        if reverse: self.items.reverse()
+        if reverse:
+            self.items.reverse()
         # --ESMs First?
         settings['mash.mods.esmsFirst'] = self.esmsFirst
         if self.esmsFirst or col == 'Load Order':
@@ -1576,7 +1577,8 @@ class ModList(List):
     def OnDoubleClick(self, event):
         """Handle doubclick event."""
         (hitItem, hitFlag) = self.list.HitTest(event.GetPosition())
-        if hitItem < 0: return
+        if hitItem < 0:
+            return
         fileInfo = self.data[self.items[hitItem]]
         if not docBrowser:
             DocBrowser().Show()
@@ -1589,7 +1591,6 @@ class ModList(List):
         if (event.GetKeyCode() == 127):
             self.DeleteSelected()
         event.Skip()
-
     # $#
 
     # --Column Resize
@@ -1782,10 +1783,12 @@ class ModDetails(wx.Window):
         event.Skip()
 
     def OnEditFile(self, event):
-        if not self.modInfo: return
+        if not self.modInfo:
+            return
         # --Changed?
         fileStr = self.file.GetValue()
-        if fileStr == self.fileStr: return
+        if fileStr == self.fileStr:
+            return
         # --Extension Changed?
         if fileStr[-4:].lower() != self.fileStr[-4:].lower():
             ErrorMessage(self, _("Incorrect file extension: ") + fileStr[-3:])
@@ -1800,16 +1803,19 @@ class ModDetails(wx.Window):
             self.SetEdited()
 
     def OnEditAuthor(self, event):
-        if not self.modInfo: return
+        if not self.modInfo:
+            return
         authorStr = self.author.GetValue()
         if authorStr != self.authorStr:
             self.authorStr = authorStr
             self.SetEdited()
 
     def OnEditModified(self, event):
-        if not self.modInfo: return
+        if not self.modInfo:
+            return
         modifiedStr = self.modified.GetValue()
-        if modifiedStr == self.modifiedStr: return
+        if modifiedStr == self.modifiedStr:
+            return
         try:
             newTimeTup = time.strptime(modifiedStr, '%c')
             time.mktime(newTimeTup)
@@ -1829,7 +1835,8 @@ class ModDetails(wx.Window):
         self.SetEdited()
 
     def OnEditDescription(self, event):
-        if not self.modInfo: return
+        if not self.modInfo:
+            return
         descriptionStr = self.description.GetValue()
         if descriptionStr != self.descriptionStr:
             self.descriptionStr = descriptionStr
@@ -1922,8 +1929,7 @@ class ModPanel(NotebookPanel):
 
     def SetStatusCount(self):
         """Sets mod count in last field."""
-        text = _("Mods: %d/%d") % (
-        len(mosh.mwIniFile.loadFiles), len(mosh.modInfos.data))
+        text = _("Mods: %d/%d") % (len(mosh.mwIniFile.loadFiles), len(mosh.modInfos.data))
         statusBar.SetStatusText(text, 2)
 
     def OnSize(self, event):
@@ -1962,8 +1968,7 @@ class SaveList(List):
         wx.EVT_LIST_ITEM_SELECTED(self, self.listId, self.OnItemSelected)
         # $# from FallenWizard
         self.list.Bind(wx.EVT_CHAR, self.OnChar)
-
-    # $#
+        # $#
 
     def Refresh(self, files='ALL', detail='SAME'):
         """Refreshes UI for specified files."""
@@ -2051,7 +2056,8 @@ class SaveList(List):
         else:
             raise MashError, _('Unrecognized sort key: ') + col
         # --Ascending
-        if reverse: self.items.reverse()
+        if reverse:
+            self.items.reverse()
 
     # --Events ---------------------------------------------
     # --Column Resize
@@ -2072,7 +2078,6 @@ class SaveList(List):
         if (event.GetKeyCode() == 127):
             self.DeleteSelected()
         event.Skip()
-
     # $#
 
 
@@ -2231,10 +2236,12 @@ class SaveDetails(wx.Window):
 
     def OnEditFile(self, event):
         """Event: Finished editing file name."""
-        if not self.saveInfo: return
+        if not self.saveInfo:
+            return
         # --Changed?
         fileStr = self.file.GetValue()
-        if fileStr == self.fileStr: return
+        if fileStr == self.fileStr:
+            return
         # --Extension Changed?
         if fileStr[-4:].lower() != self.fileStr[-4:].lower():
             ErrorMessage(self, "Incorrect file extension: " + fileStr[-3:])
@@ -2250,7 +2257,8 @@ class SaveDetails(wx.Window):
 
     def OnEditSaveName(self, event):
         """Event: Finished editing save name."""
-        if not self.saveInfo: return
+        if not self.saveInfo:
+            return
         saveNameStr = self.saveName.GetValue()
         if saveNameStr != self.saveNameStr:
             self.saveNameStr = saveNameStr
@@ -2292,7 +2300,8 @@ class SaveDetails(wx.Window):
                 progress.setBaseScale(0.67, 0.33)
                 fileRefs.safeSave()
             finally:
-                if progress != None: progress = progress.Destroy()
+                if progress != None:
+                    progress = progress.Destroy()
         # --Restore Date?
         if (changeHedr or changeMasters):
             saveInfo.setMTime(prevMTime)
@@ -2433,8 +2442,10 @@ class InstallersPanel(SashTankPanel):
                 "Do you want to enable Installers If you do, Bash will first need to initialize some data. If you have many mods installed, this can take on the order of five minutes.\n\nIf you prefer to not enable Installers at this time, you can always enable it later from the column header context menu.")
             settings['bash.installers.enabled'] = balt.askYes(self,
                 fill(message, 80), self.data.title)
-        if not settings['bash.installers.enabled']: return
-        if self.refreshing: return
+        if not settings['bash.installers.enabled']:
+            return
+        if self.refreshing:
+            return
         data = self.gList.data
         if not self.refreshed or (self.frameActivated and (
                 data.refreshRenamedNeeded() or data.refreshInstallersNeeded())
@@ -2452,12 +2463,14 @@ class InstallersPanel(SashTankPanel):
                     WarningMessage(self, _(
                         "'%s' cannot be accessed.\nThis path is possibly on a remote drive, or mispelled, or unwritable." %
                         mosh.dirs["installers"].s))
+                # -#
                 self.fullRefresh = False
                 self.frameActivated = False
                 self.refreshing = False
                 self.refreshed = True
             finally:
-                if progress != None: progress.Destroy()
+                if progress != None:
+                    progress.Destroy()
         self.SetStatusCount()
 
     def OnShowInfoPage(self, event):
@@ -2479,8 +2492,10 @@ class InstallersPanel(SashTankPanel):
     def SaveDetails(self):
         """Saves details if they need saving."""
         settings['bash.installers.page'] = self.gNotebook.GetSelection()
-        if not self.detailsItem: return
-        if not self.gComments.IsModified(): return
+        if not self.detailsItem:
+            return
+        if not self.gComments.IsModified():
+            return
         installer = self.data[self.detailsItem]
         installer.comments = self.gComments.GetValue()
         self.data.setChanged()
@@ -2494,7 +2509,8 @@ class InstallersPanel(SashTankPanel):
 
     def RefreshDetails(self, item=None):
         """Refreshes detail view associated with data from item."""
-        if item not in self.data: item = None
+        if item not in self.data:
+            item = None
         self.SaveDetails()  # --Save previous details
         self.detailsItem = item
         del self.espms[:]
@@ -2548,7 +2564,8 @@ class InstallersPanel(SashTankPanel):
 
         def sortKey(file):
             dirFile = file.lower().rsplit('\\', 1)
-            if len(dirFile) == 1: dirFile.insert(0, '')
+            if len(dirFile) == 1:
+                dirFile.insert(0, '')
             return dirFile
 
         def dumpFiles(files, default='', header='', isPath=False):
@@ -2560,7 +2577,8 @@ class InstallersPanel(SashTankPanel):
                     files = list(files)
                 sortKeys = dict((x, sortKey(x)) for x in files)
                 files.sort(key=lambda x: sortKeys[x])
-                if header: buff.write(header + '\n')
+                if header:
+                    buff.write(header + '\n')
                 for file in files:
                     buff.write(file)
                     buff.write('\n')
@@ -2746,7 +2764,8 @@ class ScreensList(List):
         else:
             raise BashError(_('Unrecognized sort key: ') + col)
         # --Ascending
-        if reverse: self.items.reverse()
+        if reverse:
+            self.items.reverse()
 
     # --Events ---------------------------------------------
     # --Column Resize
@@ -2822,7 +2841,7 @@ class ScreensPanel(NotebookPanel):
 # ------------------------------------------------------------------------------
 class UtilsDialog(wx.Dialog):
     """Dialog for crating/modifying utilities.
-	Has several text captions for name, program (with browse button), arguments and description."""
+    Has several text captions for name, program (with browse button), arguments and description."""
     result = None
 
     def __init__(self, parent, pos=wx.DefaultPosition,
@@ -3073,7 +3092,7 @@ class UtilsList(List):
 
     def ModifyItem(self):
         """Modification of an item.
-		This function modifies an item or does nothing."""
+        This function modifies an item or does nothing."""
         names = self.GetSelected()
         item = self.list.GetFirstSelected()
         # for name in names:
@@ -3103,7 +3122,7 @@ class UtilsList(List):
 
     def DeleteItem(self):
         """Deletes an item.
-		This function deletes the selected item or does nothing."""
+        This function deletes the selected item or does nothing."""
         names = self.GetSelected()
         for name in names:
             self.list.DeleteItem(self.list.GetFirstSelected())
@@ -3190,8 +3209,8 @@ class MashNotebook(wx.Notebook):
         # -# Canged for Utilities page
         # if settings['bash.installers.fastStart'] and pageIndex == 0:
         if settings['bash.installers.fastStart'] and pageIndex == 1:
-            # -#
             pageIndex = 1
+        # -#
         self.SetSelection(pageIndex)
         # --Events
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnShowPage)
@@ -3229,7 +3248,8 @@ class MashStatusBar(wx.StatusBar):
         for button in self.buttons:
             button.SetPosition((xPos, yPos))
             xPos += 18
-        if event: event.Skip()
+        if event:
+            event.Skip()
 
     def SetText(self, text="", timeout=5):
         """Set's display text as specified. Empty string clears the field."""
@@ -3293,7 +3313,8 @@ class MashFrame(wx.Frame):
     def RefreshData(self, event=None):
         """Refreshes all data. Can be called manually, but is also triggered by window activation event."""
         # --Ignore deactivation events.
-        if event and not event.GetActive(): return
+        if event and not event.GetActive():
+            return
         # --UPDATES-----------------------------------------
         popMods = popSaves = None
         # --Check morrowind.ini and mods directory...
@@ -3316,7 +3337,8 @@ class MashFrame(wx.Frame):
         elif popSaves:
             saveList.Refresh(popSaves)
         # --Current notebook panel
-        if gInstallers: gInstallers.frameActivated = True
+        if gInstallers:
+            gInstallers.frameActivated = True
         self.notebook.GetPage(self.notebook.GetSelection()).OnShow()
         # --WARNINGS----------------------------------------
         # --Does morrowind.ini have any bad or missing files?
@@ -3327,9 +3349,7 @@ class MashFrame(wx.Frame):
             WarningMessage(self, message)
         # --Was load list too long?
         if mosh.mwIniFile.loadFilesExtra:
-            message = (
-            _("Load list has been truncated because it was too long. (%s)")
-            % (', '.join(mosh.mwIniFile.loadFilesExtra),))
+            message = (_("Load list has been truncated because it was too long. (%s)") % (', '.join(mosh.mwIniFile.loadFilesExtra),))
             mosh.mwIniFile.safeSave()
             WarningMessage(self, message)
         # --Any new corrupted files?
@@ -3341,11 +3361,13 @@ class MashFrame(wx.Frame):
             self.knownCorrupted |= corruptMods
         corruptSaves = set(mosh.saveInfos.corrupted.keys())
         if not corruptSaves <= self.knownCorrupted:
-            if message: message += '\n'
+            if message:
+                message += '\n'
             message += _("The following save files have corrupted headers: ")
             message += ','.join(sorted(corruptSaves)) + '.'
             self.knownCorrupted |= corruptSaves
-        if message: WarningMessage(self, message)
+        if message:
+            WarningMessage(self, message)
         # --Any Y2038 Resets?
         if mosh.y2038Resets:
             message = (_(
@@ -3357,7 +3379,8 @@ class MashFrame(wx.Frame):
     def OnCloseWindow(self, event):
         """Handle Close event. Save application data."""
         self.CleanSettings()
-        if docBrowser: docBrowser.DoSave()
+        if docBrowser:
+            docBrowser.DoSave()
         if not self.IsIconized() and not self.IsMaximized():
             settings['mash.framePos'] = self.GetPosition()
             settings['mash.frameSize'] = self.GetSizeTuple()
@@ -3369,8 +3392,8 @@ class MashFrame(wx.Frame):
         if settingsWindow:
             settingsWindow.Destroy()
         gInstallers.SaveCfgFile()
-        # -#
         event.Skip()
+        # -#
         settings.save()
         self.Destroy()
 
@@ -3388,10 +3411,12 @@ class MashFrame(wx.Frame):
             goodNames = set(fileInfos.data.keys())
             backupDir = os.path.join(fileInfos.dir,
                 settings['mosh.fileInfo.backupDir'])
-            if not os.path.isdir(backupDir): continue
+            if not os.path.isdir(backupDir):
+                continue
             for name in sorted(os.listdir(backupDir)):
                 path = os.path.join(backupDir, name)
-                if name[-1] == 'f': name = name[:-1]
+                if name[-1] == 'f':
+                    name = name[:-1]
                 if name not in goodNames and os.path.isfile(path):
                     os.remove(path)
 
@@ -3402,7 +3427,7 @@ class DocBrowser(wx.Frame):
 
     def __init__(self, modName=None):
         """Intialize.
-		modName -- current modname (or None)."""
+        modName -- current modname (or None)."""
         # --Data
         self.modName = modName
         self.data = mosh.modInfos.table.getColumn('doc')
@@ -3485,7 +3510,8 @@ class DocBrowser(wx.Frame):
     def GetIsWtxt(self, docPath=None):
         """Determines whether specified path is a wtxt file."""
         docPath = docPath or self.data.get(self.modName, '')
-        if not os.path.exists(docPath): return False
+        if not os.path.exists(docPath):
+            return False
         textFile = file(docPath)
         maText = re.match(r'^=.+=#\s*$', textFile.readline())
         textFile.close()
@@ -3516,7 +3542,7 @@ class DocBrowser(wx.Frame):
 
     def DoForget(self, event):
         """Handle "Forget Doc" button click.
-		Sets help document for current mod name to None."""
+        Sets help document for current mod name to None."""
         # --Already have mod data?
         modName = self.modName
         if modName not in self.data:
@@ -3569,14 +3595,17 @@ class DocBrowser(wx.Frame):
         path = dialog.GetPath()
         dialog.Destroy()
         # --OS renaming
-        if path.lower() == oldPath.lower(): return
-        if os.path.exists(path): os.remove(path)
+        if path.lower() == oldPath.lower():
+            return
+        if os.path.exists(path):
+            os.remove(path)
         os.rename(oldPath, path)
         if self.docIsWtxt:
-            oldHtml, newHtml = (os.path.splitext(xxx)[0] + '.html' for xxx in
-            (oldPath, path))
-            if os.path.exists(newHtml): os.remove(newHtml)
-            if os.path.exists(oldHtml): os.rename(oldHtml, newHtml)
+            oldHtml, newHtml = (os.path.splitext(xxx)[0] + '.html' for xxx in (oldPath, path))
+            if os.path.exists(newHtml):
+                os.remove(newHtml)
+            if os.path.exists(oldHtml):
+                os.rename(oldHtml, newHtml)
         # --Remember change
         settings['mosh.workDir'] = os.path.split(path)[0]
         self.data[modName] = path
@@ -3584,7 +3613,8 @@ class DocBrowser(wx.Frame):
 
     def DoSave(self):
         """Saves doc, if necessary."""
-        if not self.plainText.IsModified(): return
+        if not self.plainText.IsModified():
+            return
         try:
             docPath = self.data.get(self.modName, '')
             if not docPath:
@@ -3641,8 +3671,7 @@ class DocBrowser(wx.Frame):
             elif os.path.exists(mashTemplate):
                 template = ''.join(open(mashTemplate).readlines())
             else:
-                template = '= $modName ' + (
-                '=' * (74 - len(modName))) + '#\n' + docPath
+                template = '= $modName ' + ('=' * (74 - len(modName))) + '#\n' + docPath
             defaultText = string.Template(template).substitute(modName=modName)
             self.plainText.SetValue(defaultText)
             self.SetDocType('txt')
@@ -3661,8 +3690,7 @@ class DocBrowser(wx.Frame):
             self.editButton.SetValue(editing)
             self.plainText.SetEditable(editing)
             self.docIsWtxt = self.GetIsWtxt(docPath)
-            htmlPath = self.docIsWtxt and (
-            os.path.splitext(docPath)[0] + '.html')
+            htmlPath = self.docIsWtxt and (os.path.splitext(docPath)[0] + '.html')
             if htmlPath and (not os.path.exists(htmlPath) or
                 (os.path.getmtime(docPath) > os.path.getmtime(htmlPath))
             ):
@@ -3697,7 +3725,7 @@ class DocBrowser(wx.Frame):
     # --Window Closing
     def OnCloseWindow(self, event):
         """Handle window close event.
-		Remember window size, position, etc."""
+        Remember window size, position, etc."""
         self.DoSave()
         settings['mash.modDocs.show'] = False
         if not self.IsIconized() and not self.IsMaximized():
@@ -3712,7 +3740,7 @@ class JournalBrowser(wx.Frame):
 
     def __init__(self, saveName=None):
         """Intialize.
-		saveName -- current saveName (or None)."""
+        saveName -- current saveName (or None)."""
         # --Data
         self.saveName = saveName
         self.data = None
@@ -3757,7 +3785,7 @@ class JournalBrowser(wx.Frame):
     # --Window Closing
     def OnCloseWindow(self, event):
         """Handle window close event.
-		Remember window size, position, etc."""
+        Remember window size, position, etc."""
         settings['mash.journal.show'] = False
         if not self.IsIconized() and not self.IsMaximized():
             settings['mash.journal.pos'] = self.GetPosition()
@@ -3778,7 +3806,7 @@ from mysh import HTMLHelpParser
 def SetHtmlHelpParser(self, hhp):
     """Sets the HtmlHelpParser to be used to get the help pages.
 
-	hhp = class mysh.HtmlHelpParser"""
+    hhp = class mysh.HtmlHelpParser"""
     self.hhp = hhp
 
 
@@ -3792,7 +3820,7 @@ def OnHyperLink(self, event):
 
 class TOCHtmlWindow(wx.lib.iewin.IEHtmlWindow):
     """Contains the table of content of the help file.
-	Typically, this is the left panel of the help window."""
+    Typically, this is the left panel of the help window."""
 
     def __init__(self, *args, **kwargs):
         """..."""
@@ -3826,7 +3854,7 @@ class TOCHtmlWindow(wx.lib.iewin.IEHtmlWindow):
 
 class HelpPage(wx.lib.iewin.IEHtmlWindow):
     """Class for the pages of the help window.
-	Typically, this is the right panel of the help window."""
+    Typically, this is the right panel of the help window."""
 
     def __init__(self, *args, **kwargs):
         """..."""
@@ -3926,7 +3954,7 @@ class DCGHelpBrowser(wx.Frame):
     # --Window Closing
     def OnCloseWindow(self, event):
         """Handle window close event.
-		Remember window size, position, etc."""
+        Remember window size, position, etc."""
         settings['mash.help.show'] = False
         if not self.IsIconized() and not self.IsMaximized():
             settings['mash.help.pos'] = self.GetPosition()
@@ -3985,7 +4013,7 @@ class HtmlHelpBrowser(wx.Frame):
     # --Window Closing
     def OnCloseWindow(self, event):
         """Handle window close event.
-		Remember window size, position, etc."""
+        Remember window size, position, etc."""
         settings['mash.help.show'] = False
         if not self.IsIconized() and not self.IsMaximized():
             settings['mash.help.pos'] = self.GetPosition()
@@ -4008,7 +4036,8 @@ class MashApp(wx.App):
     def OnInit(self):
         """wxWindows: Initialization handler."""
         # --Check/Set mwDir
-        if not self.SetMWDir(): return False
+        if not self.SetMWDir():
+            return False
         # --Init Data
         self.InitData()
         self.InitVersion()
@@ -4188,7 +4217,8 @@ class Files_Open(Link):
     def Execute(self, event):
         """Handle selection."""
         dir = GPath(self.window.data.dir)
-        if not dir.exists(): dir.makedirs()
+        if not dir.exists():
+            dir.makedirs()
         dir.start()
 
 
@@ -4207,7 +4237,8 @@ class Files_SortBy(Link):
         menuItem = wx.MenuItem(menu, self.id, self.prefix + self.sortName,
             kind=wx.ITEM_CHECK)
         menu.AppendItem(menuItem)
-        if window.sort == self.sortCol: menuItem.Check()
+        if window.sort == self.sortCol:
+            menuItem.Check()
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -4238,7 +4269,8 @@ class Files_Unhide(Link):
         else:
             wildcard = '*.*'
         # --File dialog
-        if not os.path.exists(srcDir): os.makedirs(srcDir)
+        if not os.path.exists(srcDir):
+            os.makedirs(srcDir)
         dialog = wx.FileDialog(self.window, 'Unhide files:', srcDir, '',
             wildcard,
             wx.OPEN | wx.MULTIPLE)
@@ -4304,7 +4336,8 @@ class File_Duplicate(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Duplicate...'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -4312,9 +4345,9 @@ class File_Duplicate(Link):
         fileName = data[0]
         fileInfo = self.window.data[fileName]
         (root, ext) = os.path.splitext(fileName)
-        (destDir, destName, wildcard) = (
-        fileInfo.dir, root + ' Copy' + ext, '*' + ext)
-        if not os.path.exists(destDir): os.makedirs(destDir)
+        (destDir, destName, wildcard) = (fileInfo.dir, root + ' Copy' + ext, '*' + ext)
+        if not os.path.exists(destDir):
+            os.makedirs(destDir)
         dialog = wx.FileDialog(self.window, _('Duplicate as:'), destDir,
             destName, wildcard, wx.SAVE | wx.OVERWRITE_PROMPT)
         if dialog.ShowModal() != wx.ID_OK:
@@ -4392,7 +4425,8 @@ class File_MoveTo(Link):
         destDir = os.path.join(self.window.data.dir,
             settings['mosh.fileInfo.hiddenDir'])
         destDir = DirDialog(self.window, _('Move To...'), destDir)
-        if not destDir: return
+        if not destDir:
+            return
         # --Do it
         fileInfos = self.window.data
         for fileName in self.data:
@@ -4428,7 +4462,8 @@ class File_Redate(Link):
         result = dialog.ShowModal()
         newTimeStr = dialog.GetValue()
         dialog.Destroy()
-        if result != wx.ID_OK: return
+        if result != wx.ID_OK:
+            return
         try:
             newTimeTup = time.strptime(newTimeStr, '%c')
             newTime = int(time.mktime(newTimeTup))
@@ -4458,7 +4493,8 @@ class File_Sort(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Sort'))
         menu.AppendItem(menuItem)
-        if len(data) < 2: menuItem.Enable(False)
+        if len(data) < 2:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -4487,7 +4523,8 @@ class File_Snapshot(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Snapshot...'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -4495,7 +4532,8 @@ class File_Snapshot(Link):
         fileName = data[0]
         fileInfo = self.window.data[fileName]
         (destDir, destName, wildcard) = fileInfo.getNextSnapshot()
-        if not os.path.exists(destDir): os.makedirs(destDir)
+        if not os.path.exists(destDir):
+            os.makedirs(destDir)
         dialog = wx.FileDialog(self.window, _('Save snapshot as:'), destDir,
             destName, wildcard, wx.SAVE | wx.OVERWRITE_PROMPT)
         if dialog.ShowModal() != wx.ID_OK:
@@ -4540,7 +4578,8 @@ class File_RevertToSnapshot(Link):
         srcDir = os.path.join(destDir, settings['mosh.fileInfo.snapshotDir'])
         wildcard = fileInfo.getNextSnapshot()[2]
         # --File dialog
-        if not os.path.exists(srcDir): os.makedirs(srcDir)
+        if not os.path.exists(srcDir):
+            os.makedirs(srcDir)
         dialog = wx.FileDialog(self.window,
             _('Revert %s to snapshot:') % (fileName,),
             srcDir, '', wildcard, wx.OPEN)
@@ -4819,7 +4858,8 @@ class File_Remove_Refs:
             reObjId = re.compile('"?(.*?)"?\t')
             for line in removerFile:
                 maObjId = reObjId.match(line)
-                if not maObjId or not maObjId.group(1): continue
+                if not maObjId or not maObjId.group(1):
+                    continue
                 objIds.add(maObjId.group(1))
             removerFile.close()
         # --File Refs
@@ -4973,8 +5013,7 @@ class File_Replace_Refs:
                     refReplacer.srcModName = srcModName
                 else:
                     ErrorMessage(self.window,
-                        _("Source mod %s is not in Data Files folder.") % (
-                        srcModName,))
+                        _("Source mod %s is not in Data Files folder.") % (srcModName,))
                     return
             log.setHeader(_("Source Mod"))
             log(srcModName or _("None"))
@@ -4991,7 +5030,8 @@ class File_Replace_Refs:
                 self.window.details.SetFile(fileName)
                 LogMessage(self.window, '', log.out.getvalue(), caption)
         finally:
-            if progress != None: progress.Destroy()
+            if progress != None:
+                progress.Destroy()
             self.window.Refresh(fileName)
 
     def DoData(self, event):
@@ -5005,13 +5045,14 @@ class File_Replace_Refs:
 # ------------------------------------------------------------------------------
 class File_RepairRefs(Link):
     """Repairs the save game's refs by comparing their type and id against the
-	types and ids of the save game's masters."""
+    types and ids of the save game's masters."""
 
     def AppendToMenu(self, menu, window, data):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Repair Refs'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -5068,21 +5109,24 @@ class File_RepairRefs(Link):
             LogMessage(self.window, message, log.out.getvalue(), caption)
         # --Done
         finally:
-            if progress != None: progress.Destroy()
-            if dialog: dialog.Destroy()
+            if progress != None:
+                progress.Destroy()
+            if dialog:
+                dialog.Destroy()
             self.window.Refresh(fileName)
 
 
 # ------------------------------------------------------------------------------
 class File_SortRecords(Link):
     """Sorts the records in the file.
-	This is just to make records easier to find in TESCS Details view."""
+    This is just to make records easier to find in TESCS Details view."""
 
     def AppendToMenu(self, menu, window, data):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Sort Records'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -5168,7 +5212,8 @@ class File_StatsList(List):
         elif col == 'Size':
             self.items.sort(lambda a, b: cmp(data[a][1], data[b][1]))
         # --Reverse?
-        if reverse: self.items.reverse()
+        if reverse:
+            self.items.reverse()
 
 
 # ------------------------------------------------------------------------------
@@ -5179,7 +5224,8 @@ class File_Stats(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Statistics'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -5188,8 +5234,7 @@ class File_Stats(Link):
         fileInfo = self.window.data[fileName]
         fileInfo.getStats()
         frame = wx.Frame(self.window, -1, fileName, size=(200, 300),
-            style=(
-            wx.RESIZE_BORDER | wx.CAPTION | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CLIP_CHILDREN))
+            style=(wx.RESIZE_BORDER | wx.CAPTION | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CLIP_CHILDREN))
         frame.SetIcons(images['mash.icons2'].GetIconBundle())
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(File_StatsList(frame, fileInfo.stats), 1, wx.EXPAND)
@@ -5321,7 +5366,8 @@ class Installers_Refresh(Link):
         self.fullRefresh = fullRefresh
 
     def AppendToMenu(self, menu, window, data):
-        if not settings['bash.installers.enabled']: return
+        if not settings['bash.installers.enabled']:
+            return
         Link.AppendToMenu(self, menu, window, data)
         self.title = (_('Refresh Data'), _('Full Refresh'))[self.fullRefresh]
         menuItem = wx.MenuItem(menu, self.id, self.title)
@@ -5332,8 +5378,8 @@ class Installers_Refresh(Link):
         if self.fullRefresh:
             message = balt.fill(_(
                 "Refresh ALL data from scratch? This may take five to ten minutes (or more) depending on the number of mods you have installed."))
-            if not balt.askWarning(self.gTank, fill(message, 80),
-                self.title): return
+            if not balt.askWarning(self.gTank, fill(message, 80), self.title):
+                return
         gInstallers.refreshed = False
         gInstallers.fullRefresh = self.fullRefresh
         gInstallers.OnShow()
@@ -5434,7 +5480,8 @@ class InstallerLink(Link):
         return bosh.dirs['builds'].join(archive.sroot)
 
     def projectExists(self):
-        if not len(self.selected) == 1: return False
+        if not len(self.selected) == 1:
+            return False
         return self.getProjectPath().exists()
 
 
@@ -5496,7 +5543,8 @@ class Installer_Duplicate(InstallerLink):
         result = balt.askText(self.gTank, _("Duplicate %s to:") % curName.s,
             self.title, newName.s)
         result = (result or '').strip()
-        if not result: return
+        if not result:
+            return
         # --Error checking
         newName = GPath(result).tail
         if not newName.s:
@@ -5508,8 +5556,7 @@ class Installer_Duplicate(InstallerLink):
         if self.data.dir.join(
             curName).isfile() and curName.cext != newName.cext:
             balt.ShowWarning(self.gTank,
-                _("%s does not have correct extension (%s).") % (
-                newName.s, curName.ext))
+                _("%s does not have correct extension (%s).") % (newName.s, curName.ext))
             return
         # --Duplicate
         try:
@@ -5590,7 +5637,8 @@ class Installer_Move(InstallerLink):
         message = _(
             "Move selected archives to what position?\nEnter position number.\nLast: -1; First of Last: -2; Semi-Last: -3.")
         newPos = balt.askText(self.gTank, message, self.title, `curPos`)
-        if not newPos: return
+        if not newPos:
+            return
         newPos = newPos.strip()
         if not re.match('-?\d+', newPos):
             balt.showError(self.gTank, _("Position must be an integer."))
@@ -5620,8 +5668,6 @@ class Installers_Open(balt.Tank_Open):
         if not os.access(mosh.dirs["installers"].s, os.W_OK):
             menuItem.Enable(False)
         # print menuItem.Enabled
-
-
 # -#
 class Installer_Open(balt.Tank_Open):
     """Open selected file(s)."""
@@ -5657,7 +5703,8 @@ class Installer_Refresh(InstallerLink):
                     SubProgress(progress, index, index + 1), True)
                 self.data.hasChanged = True
         finally:
-            if progress != None: progress.Destroy()
+            if progress != None:
+                progress.Destroy()
         self.data.refresh(what='NS')
         self.gTank.RefreshUI()
 
@@ -5703,7 +5750,8 @@ class InstallerArchive_Unpack(InstallerLink):
             _("Unpack %s to Project:") % archive.s,
             self.title, project.s)
         result = (result or '').strip()
-        if not result: return
+        if not result:
+            return
         # --Error checking
         project = GPath(result).tail
         if not project.s or project.cext in ('.rar', '.zip', '.7z'):
@@ -5735,7 +5783,7 @@ class InstallerArchive_Unpack(InstallerLink):
                 self.data.moveArchives([project], installer.order + 1)
             self.data.refresh(what='NS')
             self.gTank.RefreshUI()
-        # pProject.start()
+            # pProject.start()
         finally:
             progress.Destroy()
 
@@ -5765,7 +5813,8 @@ class InstallerProject_Sync(InstallerLink):
         message = _(
             "Update %s according to data directory?\nFiles to delete: %d\nFiles to update: %d") % (
                       project.s, len(missing), len(mismatched))
-        if not balt.askWarning(self.gTank, message, self.title): return
+        if not balt.askWarning(self.gTank, message, self.title):
+            return
         # --Sync it, baby!
         progress = balt.Progress(self.title, '\n' + ' ' * 60)
         try:
@@ -5950,7 +5999,8 @@ class Mods_EsmsFirst(Link):
         menuItem = wx.MenuItem(menu, self.id, self.prefix + _('Type'),
             kind=wx.ITEM_CHECK)
         menu.AppendItem(menuItem)
-        if window.esmsFirst: menuItem.Check()
+        if window.esmsFirst:
+            menuItem.Check()
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -5987,7 +6037,8 @@ class Mods_SelectedFirst(Link):
         menuItem = wx.MenuItem(menu, self.id, self.prefix + _('Selection'),
             kind=wx.ITEM_CHECK)
         menu.AppendItem(menuItem)
-        if window.selectedFirst: menuItem.Check()
+        if window.selectedFirst:
+            menuItem.Check()
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -6004,7 +6055,8 @@ class Mods_LockTimes(Link):
         menuItem = wx.MenuItem(menu, self.id, _('Lock Times'),
             kind=wx.ITEM_CHECK)
         menu.AppendItem(menuItem)
-        if mosh.modInfos.resetMTimes: menuItem.Check()
+        if mosh.modInfos.resetMTimes:
+            menuItem.Check()
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -6045,7 +6097,8 @@ class Mods_ReplacersData(ListEditorData):
             self.data[item].apply(progress)
             return True
         finally:
-            if progress != None: progress.Destroy()
+            if progress != None:
+                progress.Destroy()
 
     def uncheck(self, item):
         """Unchecks item. Return true on success."""
@@ -6310,7 +6363,8 @@ class Mod_CopyToEsmp(Link):
             result = WarningMessage(self.window,
                 _('Replace existing %s?') % (newName,),
                 style=(wx.YES_NO | wx.ICON_EXCLAMATION))
-            if result != wx.ID_YES: return
+            if result != wx.ID_YES:
+                return
             mosh.modInfos[newName].makeBackup()
         # --Copy, set type, update mtime.
         self.window.data.copy(curName, modsDir, newName, True)
@@ -6469,7 +6523,8 @@ class Mod_Import_LCVSchedules(Link):
         table = self.window.data.table
         textPath = table.getItem(fileName, 'schedules.path')
         textPath = pickScheduleFile(_('Import LCV schedules from:'), textPath)
-        if not textPath: return
+        if not textPath:
+            return
         (textDir, textName) = os.path.split(textPath)
         table.setItem(fileName, 'schedules.path', textPath)
         # --Import
@@ -6609,7 +6664,7 @@ class Mod_Import_Scripts(Link):
 # ------------------------------------------------------------------------------
 class Mod_RenumberRefs(Link):
     """Renumbers the references of an esp in an attempt to avoid local ref
-	conflicts between mods."""
+    conflicts between mods."""
 
     def AppendToMenu(self, menu, window, data):
         Link.AppendToMenu(self, menu, window, data)
@@ -6674,8 +6729,10 @@ class Mod_RenumberRefs(Link):
                 table.setItem(fileName, 'firstObjectIndex', first)
         # --Done
         finally:
-            if progress != None: progress.Destroy()
-            if dialog: dialog.Destroy()
+            if progress != None:
+                progress.Destroy()
+            if dialog:
+                dialog.Destroy()
             self.window.Refresh(fileName)
 
     def getNewFirst(self, curFirst, newFirst):
@@ -6784,7 +6841,8 @@ class Mod_Updaters(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Updaters...'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -6849,8 +6907,7 @@ class Saves_ProfilesData(ListEditorData):
                 _('Name must be between 1 and 64 characters long.'))
             return False
         # --Rename
-        oldDir, newDir = (os.path.join(self.hidden, dir) for dir in
-        (oldName, newName))
+        oldDir, newDir = (os.path.join(self.hidden, dir) for dir in (oldName, newName))
         os.rename(oldDir, newDir)
         if oldName == settings['mash.profile']:
             settings['mash.profile'] = newName
@@ -6871,8 +6928,7 @@ class Saves_ProfilesData(ListEditorData):
             mosh.reSaveFile.search(file)]
         if files:
             message = _(
-                'Delete profile %s and the %d save files it contains?') % (
-                      profile, len(files))
+                'Delete profile %s and the %d save files it contains?') % (profile, len(files))
             if WarningQuery(self.parent, message,
                 _('Delete Profile')) != wx.ID_YES:
                 return False
@@ -6894,7 +6950,8 @@ class Saves_Profiles:
             settings['mosh.fileInfo.hiddenDir'])
         self.defaultName = _('Default')
         self.defaultDir = os.path.join(self.hidden, self.defaultName)
-        if not os.path.exists(self.defaultDir): os.makedirs(self.defaultDir)
+        if not os.path.exists(self.defaultDir):
+            os.makedirs(self.defaultDir)
         isGood = lambda a: os.path.isdir(os.path.join(self.hidden, a))
         items = [dir for dir in os.listdir(self.hidden) if isGood(dir)]
         items.sort(key=string.lower)
@@ -6910,7 +6967,8 @@ class Saves_Profiles:
         # --Profiles
         items = self.GetItems()
         curProfile = settings.get('mash.profile', self.defaultName)
-        if curProfile not in items: curProfile = self.defaultName
+        if curProfile not in items:
+            curProfile = self.defaultName
         for id, item in zip(self.idList, items):
             menuItem = wx.MenuItem(menu, id, item, kind=wx.ITEM_CHECK)
             menu.AppendItem(menuItem)
@@ -6932,7 +6990,8 @@ class Saves_Profiles:
         # --Profile Names
         arcProfile = settings.get('mash.profile', self.defaultName)
         srcProfile = self.GetItems()[event.GetId() - self.idList.BASE]
-        if srcProfile == arcProfile: return
+        if srcProfile == arcProfile:
+            return
         # --Dirs
         arcDir, srcDir = [os.path.join(self.hidden, dir) for dir in
             (arcProfile, srcProfile)]
@@ -6940,10 +6999,10 @@ class Saves_Profiles:
         # --Progress
         progress = None
         arcFiles = sorted(mosh.saveInfos.data)
-        srcFiles = sorted(name for name in os.listdir(srcDir) if
-        (len(name) > 5 and name[-4:].lower() == '.ess'))
+        srcFiles = sorted(name for name in os.listdir(srcDir) if (len(name) > 5 and name[-4:].lower() == '.ess'))
         arcCount, srcCount = len(arcFiles), len(srcFiles)
-        if (arcCount + srcCount) == 0: return
+        if (arcCount + srcCount) == 0:
+            return
         try:
             progress = ProgressDialog(_('Moving Files'))
             # --Move arc saves to arc profile directory
@@ -6951,7 +7010,8 @@ class Saves_Profiles:
                 progress(1.0 * num / (arcCount + srcCount), saveName)
                 savesPath, profPath = [os.path.join(dir, saveName) for dir in
                     (savesDir, arcDir)]
-                if not os.path.exists(profPath): os.rename(savesPath, profPath)
+                if not os.path.exists(profPath):
+                    os.rename(savesPath, profPath)
             arcIniPath = os.path.join(arcDir, 'Morrowind.ini')
             shutil.copyfile(mosh.mwIniFile.path, arcIniPath)
             settings['mash.profile'] = srcProfile
@@ -6961,7 +7021,8 @@ class Saves_Profiles:
                     saveName)
                 savesPath, profPath = [os.path.join(dir, saveName) for dir in
                     (savesDir, srcDir)]
-                if not os.path.exists(savesPath): os.rename(profPath, savesPath)
+                if not os.path.exists(savesPath):
+                    os.rename(profPath, savesPath)
             srcIniPath = os.path.join(srcDir, 'Morrowind.ini')
             if os.path.exists(srcIniPath):
                 shutil.copyfile(srcIniPath, mosh.mwIniFile.path)
@@ -6999,7 +7060,8 @@ class Save_Duplicate(File_Duplicate):
         fileName = data[0]
         fileInfo = self.window.data[fileName]
         saveName = fileInfo.tes3.hedr.description + _(" Copy")
-        if len(saveName) > 31: saveName = saveName[:31]
+        if len(saveName) > 31:
+            saveName = saveName[:31]
         # --Save name
         dialog = wx.TextEntryDialog(self.window, _('Duplicate as:'),
             _('Duplicate'), saveName)
@@ -7008,11 +7070,14 @@ class Save_Duplicate(File_Duplicate):
         dialog.Destroy()
         if result != wx.ID_OK or not saveName:
             return
-        if len(saveName) > 31: saveName = saveName[:31]
+        if len(saveName) > 31:
+            saveName = saveName[:31]
         # --File Name
         base = re.sub(r'\W', '', saveName)
-        if not base: base = 'SaveGame'
-        if len(base) > 8: base = base[:8]
+        if not base:
+            base = 'SaveGame'
+        if len(base) > 8:
+            base = base[:8]
         count = 0
         destName = "%s%04d.ess" % (base, count)
         destDir = fileInfo.dir
@@ -7039,7 +7104,8 @@ class Save_LoadMasters(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Load Masters'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -7064,9 +7130,7 @@ class Save_LoadMasters(Link):
         self.window.details.SetFile(fileName)
         # --Missing masters?
         if missing:
-            message = (
-            _('Please update masters to correct for missing masters (%s).')
-            % (','.join(missing),))
+            message = (_('Please update masters to correct for missing masters (%s).') % (','.join(missing),))
             WarningMessage(self.window, message)
 
 
@@ -7078,7 +7142,8 @@ class Save_MapNotes(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Map Notes'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -7101,7 +7166,8 @@ class Save_MapNotes(Link):
                             mosh.cstrip(endRecord.data)))
             LogMessage(self.window, '', log.out.getvalue(), caption)
         finally:
-            if progress != None: progress.Destroy()
+            if progress != None:
+                progress.Destroy()
 
 
 # ------------------------------------------------------------------------------
@@ -7112,7 +7178,8 @@ class Save_Remove_SpawnedCreatures(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Spawned Creatures'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -7134,7 +7201,8 @@ class Save_Remove_SpawnedCreatures(Link):
             else:
                 InfoMessage(self.window, _("No spawn points to remove/reset!"))
         finally:
-            if progress != None: progress.Destroy()
+            if progress != None:
+                progress.Destroy()
             self.window.Refresh(fileName)
 
 
@@ -7146,7 +7214,8 @@ class Save_Remove_DebrisCells(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Debris Cells'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -7201,13 +7270,14 @@ class Save_Remove_DebrisCells(Link):
 # ------------------------------------------------------------------------------
 class Save_RepairAll(Link):
     """Repairs the save game's refs by comparing their type and id against the
-	types and ids of the save game's masters."""
+    types and ids of the save game's masters."""
 
     def AppendToMenu(self, menu, window, data):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Repair All'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -7259,8 +7329,7 @@ class Save_RepairAll(Link):
             log.setHeader(_("Overriding lists:"))
             cntLists = worldRefs.removeOverLists(fileRefs)
             # --No problems?
-            if not (
-                                cntRepaired or cntDeleted or cntUnnamed or cntDebris or cntOrphans or cntLists):
+            if not (cntRepaired or cntDeleted or cntUnnamed or cntDebris or cntOrphans or cntLists):
                 progress = progress.Destroy()
                 InfoMessage(self.window, _("No problems found!"))
                 return
@@ -7269,15 +7338,15 @@ class Save_RepairAll(Link):
             # --Problem Dialog
             message = (_("Objects repaired: %d.\nObjects deleted: %d.") %
                        (cntRepaired, cntDeleted))
-            message += (
-            _("\nDebris records deleted: %d.\nOrphan contents deleted: %d.") %
-            (cntDebris, cntOrphans))
+            message += (_("\nDebris records deleted: %d.\nOrphan contents deleted: %d.") % (cntDebris, cntOrphans))
             message += (_("\nOverriding lists deleted: %d.") % (cntLists,))
             LogMessage(self.window, message, log.out.getvalue(), caption)
         # --Done
         finally:
-            if progress != None: progress.Destroy()
-            if dialog: dialog.Destroy()
+            if progress != None:
+                progress.Destroy()
+            if dialog:
+                dialog.Destroy()
             self.window.Refresh(fileName)
 
 
@@ -7289,7 +7358,8 @@ class Save_Review(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Review'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -7316,7 +7386,8 @@ class Save_Review(Link):
             LogMessage(self.window, '', log.out.getvalue(), caption)
         # --Done
         finally:
-            if progress != None: progress.Destroy()
+            if progress != None:
+                progress.Destroy()
 
 
 # ------------------------------------------------------------------------------
@@ -7347,7 +7418,8 @@ class Save_UpdateWorldMap(Link):
         Link.AppendToMenu(self, menu, window, data)
         menuItem = wx.MenuItem(menu, self.id, _('Update Map'))
         menu.AppendItem(menuItem)
-        if len(data) != 1: menuItem.Enable(False)
+        if len(data) != 1:
+            menuItem.Enable(False)
 
     def Execute(self, event):
         """Handle menu selection."""
@@ -7394,8 +7466,10 @@ class Save_UpdateWorldMap(Link):
             InfoMessage(self.window, _("World map updated."))
         # --Done
         finally:
-            if progress != None: progress.Destroy()
-            if dialog: dialog.Destroy()
+            if progress != None:
+                progress.Destroy()
+            if dialog:
+                dialog.Destroy()
             self.window.Refresh(fileName)
 
 
@@ -7433,7 +7507,7 @@ class Masters_CopyList(Link):
 # ------------------------------------------------------------------------------
 class Masters_Update(Link):
     """Updates masters list and prepares it for further manual editing.
-	Automatically fixes: names, sizes and load order."""
+    Automatically fixes: names, sizes and load order."""
 
     def AppendToMenu(self, menu, window, data):
         Link.AppendToMenu(self, menu, window, data)
@@ -7552,7 +7626,8 @@ class Screens_NextScreenShot(Link):
         pattern = balt.askText(self.window, _(
             "Screenshot base name, optionally with next screenshot number.\nE.g. ScreenShot or ScreenShot_101 or Subdir\\ScreenShot_201."),
             _("Next Shot..."), base + next)
-        if not pattern: return
+        if not pattern:
+            return
         maPattern = rePattern.match(pattern)
         newBase, newNext = maPattern.groups()
         settings = {LString('General'): {
@@ -7562,8 +7637,8 @@ class Screens_NextScreenShot(Link):
         }}
         screensDir = GPath(newBase).head
         if screensDir:
-            if not screensDir.isabs(): screensDir = bosh.dirs['app'].join(
-                screensDir)
+            if not screensDir.isabs():
+                screensDir = bosh.dirs['app'].join(screensDir)
             screensDir.makedirs()
         ini.saveSettings(settings)
         bosh.screensData.refresh()
@@ -7592,13 +7667,16 @@ class Screen_ConvertToJpg(Link):
                 progress(index, fileName.s)
                 srcPath = srcDir.join(fileName)
                 destPath = srcPath.root + '.jpg'
-                if srcPath == destPath or destPath.exists(): continue
+                if srcPath == destPath or destPath.exists():
+                    continue
                 bitmap = wx.Bitmap(srcPath.s)
                 result = bitmap.SaveFile(destPath.s, wx.BITMAP_TYPE_JPEG)
-                if not result: continue
+                if not result:
+                    continue
                 srcPath.remove()
         finally:
-            if progress: progress.Destroy()
+            if progress:
+                progress.Destroy()
             bosh.screensData.refresh()
             self.window.RefreshUI()
 
@@ -7620,7 +7698,8 @@ class Screen_Rename(Link):
         pattern = balt.askText(self.window,
             _("Enter new name. E.g. Screenshot 123.bmp"),
             _("Rename Files"), fileName0.s)
-        if not pattern: return
+        if not pattern:
+            return
         maPattern = rePattern.match(pattern)
         if not maPattern:
             balt.showError(self.window,
@@ -7650,7 +7729,8 @@ class App_Morrowind(Link):
     """Launch Morrowind."""
 
     def GetBitmapButton(self, window, style=0):
-        if not self.id: self.id = wx.NewId()
+        if not self.id:
+            self.id = wx.NewId()
         button = wx.BitmapButton(window, self.id,
             images['morrowind'].GetBitmap(), style=style)
         button.SetToolTip(wx.ToolTip(_("Launch Morrowind")))
@@ -7677,7 +7757,7 @@ class AutoQuit_Button(Link):
 
     def SetState(self, state=None):
         """Sets state related info. If newState != none, sets to new state first.
-		For convenience, returns state when done."""
+        For convenience, returns state when done."""
         if state == None:  # --Default
             state = settings.get('mash.autoQuit.on', False)
         elif state == -1:  # --Invert
@@ -7707,7 +7787,8 @@ class App_Help(Link):
     """Show help browser."""
 
     def GetBitmapButton(self, window, style=0):
-        if not self.id: self.id = wx.NewId()
+        if not self.id:
+            self.id = wx.NewId()
         button = wx.BitmapButton(window, self.id, images['help'].GetBitmap(),
             style=style)
         button.SetToolTip(wx.ToolTip(_("Help File")))
@@ -7801,7 +7882,7 @@ class Utils_New(Link):
 # Initialization --------------------------------------------------------------
 def InitSettings():
     """Initialize settings (configuration store). First, read from file, then
-	load defaults (defaults will not overwrite items extracted from file)."""
+    load defaults (defaults will not overwrite items extracted from file)."""
     mosh.initSettings()
     global settings
     settings = mosh.settings
@@ -7862,9 +7943,7 @@ def InitStatusBar():
     MashStatusBar.links.append(App_Help())
     # -#
     MashStatusBar.links.append(App_Settings())
-
-
-# -#
+    # -#
 
 def InitMasterLinks():
     """Initialize master list menus."""
@@ -8098,8 +8177,9 @@ def InitLinks():
     InitModLinks()
     InitSaveLinks()
     InitScreenLinks()
+    # -#
     InitUtilsLinks()
-
+    # -#
 
 # -# Added D.C.-G. for Utils panel. ------------------------------------------------------------------------
 def InitUtilsLinks():
@@ -8107,8 +8187,6 @@ def InitUtilsLinks():
     UtilsList.mainMenu.append(Utils_New())
     UtilsList.mainMenu.append(Utils_Modify())
     UtilsList.mainMenu.append(Utils_Delete())
-
-
 # -#
 
 # Main ------------------------------------------------------------------------
