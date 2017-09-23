@@ -15,7 +15,7 @@
 #  along with Wrye Bolt; if not, write to the Free Software Foundation,
 #  Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#  Wrye Bolt copyright (C) 2005, 2006, 2007, 2008, 2009 Wrye 
+#  Wrye Bolt copyright (C) 2005, 2006, 2007, 2008, 2009 Wrye
 #
 # =============================================================================
 
@@ -40,14 +40,14 @@ from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 
 # Basics ---------------------------------------------------------------------
 class IdList:
-    """Provides sequences of semi-unique ids. Useful for choice menus. 
+    """Provides sequences of semi-unique ids. Useful for choice menus.
 
-    Sequence ids come in range from baseId up through (baseId + size - 1). 
+    Sequence ids come in range from baseId up through (baseId + size - 1).
     Named ids will be assigned ids starting at baseId + size.
-    
+
     Example:
-      loadIds = IdList(10000, 90,'SAVE','EDIT','NONE') 
-    sequence ids are accessed by an iterator: i.e. iter(loadIds), and 
+      loadIds = IdList(10000, 90,'SAVE','EDIT','NONE')
+    sequence ids are accessed by an iterator: i.e. iter(loadIds), and
     named ids accessed by name. e.g. loadIds.SAVE, loadIds.EDIT, loadIds.NONE
     """
 
@@ -217,7 +217,7 @@ def ensureDisplayed(frame, x=100, y=100):
 
 
 def setCheckListItems(gList, names, values):
-    """Convenience method for setting a bunch of wxCheckListBox items. The main advantage 
+    """Convenience method for setting a bunch of wxCheckListBox items. The main advantage
     of this is that it doesn't clear the list unless it needs to. Which is good if you want
     to preserve the scroll position of the list."""
     if not names:
@@ -251,8 +251,10 @@ def bitmapButton(parent, bitmap, pos=defPos, size=defSize, style=wx.BU_AUTODRAW,
     name='button', id=defId, onClick=None, tip=None):
     """Creates a button, binds click function, then returns bound button."""
     gButton = wx.BitmapButton(parent, id, bitmap, pos, size, style, val, name)
-    if onClick: gButton.Bind(wx.EVT_BUTTON, onClick)
-    if tip: gButton.SetToolTip(tooltip(tip))
+    if onClick:
+        gButton.Bind(wx.EVT_BUTTON, onClick)
+    if tip:
+        gButton.SetToolTip(tooltip(tip))
     return gButton
 
 
@@ -260,8 +262,10 @@ def button(parent, label='', pos=defPos, size=defSize, style=0, val=defVal,
     name='button', id=defId, onClick=None, tip=None):
     """Creates a button, binds click function, then returns bound button."""
     gButton = wx.Button(parent, id, label, pos, size, style, val, name)
-    if onClick: gButton.Bind(wx.EVT_BUTTON, onClick)
-    if tip: gButton.SetToolTip(tooltip(tip))
+    if onClick:
+        gButton.Bind(wx.EVT_BUTTON, onClick)
+    if tip:
+        gButton.SetToolTip(tooltip(tip))
     return gButton
 
 
@@ -270,8 +274,10 @@ def toggleButton(parent, label='', pos=defPos, size=defSize, style=0,
     name='button', id=defId, onClick=None, tip=None):
     """Creates a toggle button, binds toggle function, then returns bound button."""
     gButton = wx.ToggleButton(parent, id, label, pos, size, style, val, name)
-    if onClick: gButton.Bind(wx.EVT_TOGGLEBUTTON, onClick)
-    if tip: gButton.SetToolTip(tooltip(tip))
+    if onClick:
+        gButton.Bind(wx.EVT_TOGGLEBUTTON, onClick)
+    if tip:
+        gButton.SetToolTip(tooltip(tip))
     return gButton
 
 
@@ -279,8 +285,10 @@ def checkBox(parent, label='', pos=defPos, size=defSize, style=0, val=defVal,
     name='checkBox', id=defId, onCheck=None, tip=None):
     """Creates a checkBox, binds check function, then returns bound button."""
     gCheckBox = wx.CheckBox(parent, id, label, pos, size, style, val, name)
-    if onCheck: gCheckBox.Bind(wx.EVT_CHECKBOX, onCheck)
-    if tip: gCheckBox.SetToolTip(tooltip(tip))
+    if onCheck:
+        gCheckBox.Bind(wx.EVT_CHECKBOX, onCheck)
+    if tip:
+        gCheckBox.SetToolTip(tooltip(tip))
     return gCheckBox
 
 
@@ -296,8 +304,10 @@ def spinCtrl(parent, value='', pos=defPos, size=defSize, style=wx.SP_ARROW_KEYS,
     """Spin control with event and tip setting."""
     gSpinCtrl = wx.SpinCtrl(parent, id, value, pos, size, style, min, max,
         initial, name)
-    if onSpin: gSpinCtrl.Bind(wx.EVT_SPINCTRL, onSpin)
-    if tip: gSpinCtrl.SetToolTip(tooltip(tip))
+    if onSpin:
+        gSpinCtrl.Bind(wx.EVT_SPINCTRL, onSpin)
+    if tip:
+        gSpinCtrl.SetToolTip(tooltip(tip))
     return gSpinCtrl
 
 
@@ -385,7 +395,8 @@ def askContinue(parent, message, continueKey, title=_('Warning')):
     """Shows a modal continue query if value of continueKey is false. Returns True to continue.
     Also provides checkbox "Don't show this in future." to set continueKey to true."""
     # --ContinueKey set?
-    if _settings.get(continueKey): return wx.ID_OK
+    if _settings.get(continueKey):
+        return wx.ID_OK
     # --Generate/show dialog
     dialog = wx.Dialog(parent, defId, title, size=(350, 200),
         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
@@ -459,7 +470,7 @@ def askText(parent, message, title='', default=''):
 
 # Message Dialogs -------------------------------------------------------------
 def askStyled(parent, message, title, style):
-    """Shows a modal MessageDialog. 
+    """Shows a modal MessageDialog.
     Use ErrorMessage, WarningMessage or InfoMessage."""
     dialog = wx.MessageDialog(parent, message, title, style)
     result = dialog.ShowModal()
@@ -474,8 +485,7 @@ def askOk(parent, message, title=''):
 
 def askYes(parent, message, title='', default=True):
     """Shows a modal warning message."""
-    style = wx.YES_NO | wx.ICON_EXCLAMATION | (
-    (wx.NO_DEFAULT, wx.YES_DEFAULT)[default])
+    style = wx.YES_NO | wx.ICON_EXCLAMATION | ((wx.NO_DEFAULT, wx.YES_DEFAULT)[default])
     return askStyled(parent, message, title, style)
 
 
@@ -508,7 +518,8 @@ def showInfo(parent, message, title=_('Information')):
 def showList(parent, header, items, maxItems=0, title=''):
     """Formats a list of items into a message for use in a Message."""
     numItems = len(items)
-    if maxItems <= 0: maxItems = numItems
+    if maxItems <= 0:
+        maxItems = numItems
     message = string.Template(header).substitute(count=numItems)
     message += '\n* ' + '\n* '.join(items[:min(numItems, maxItems)])
     if numItems > maxItems:
@@ -538,9 +549,9 @@ def showLog(parent, logText, title='', style=0, asDialog=True, fixedFont=False,
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
     else:
         window = wx.Frame(parent, defId, title, pos=pos, size=size,
-            style=(
-            wx.RESIZE_BORDER | wx.CAPTION | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CLIP_CHILDREN))
-        if icons: window.SetIcons(icons)
+            style=(wx.RESIZE_BORDER | wx.CAPTION | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CLIP_CHILDREN))
+        if icons:
+            window.SetIcons(icons)
     window.SetSizeHints(200, 200)
     window.Bind(wx.EVT_CLOSE, showLogClose)
     window.SetBackgroundColour(
@@ -587,9 +598,9 @@ def showWryeLog(parent, logText, title='', style=0, asDialog=True, icons=None):
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
     else:
         window = wx.Frame(parent, defId, title, pos=pos, size=size,
-            style=(
-            wx.RESIZE_BORDER | wx.CAPTION | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CLIP_CHILDREN))
-        if icons: window.SetIcons(icons)
+            style=(wx.RESIZE_BORDER | wx.CAPTION | wx.SYSTEM_MENU | wx.CLOSE_BOX | wx.CLIP_CHILDREN))
+        if icons:
+            window.SetIcons(icons)
     window.SetSizeHints(200, 200)
     window.Bind(wx.EVT_CLOSE, showLogClose)
     # --Text
@@ -765,8 +776,7 @@ class ListEditor(wx.Dialog):
         # --Infobox
         if data.showInfo:
             self.gInfoBox = wx.TextCtrl(self, -1, " ", size=(130, -1),
-                style=(
-                      self.data.infoReadOnly * wx.TE_READONLY) | wx.TE_MULTILINE | wx.SUNKEN_BORDER)
+                style=(self.data.infoReadOnly * wx.TE_READONLY) | wx.TE_MULTILINE | wx.SUNKEN_BORDER)
             if not self.data.infoReadOnly:
                 self.gInfoBox.Bind(wx.EVT_TEXT, self.OnInfoEdit)
         else:
@@ -784,7 +794,8 @@ class ListEditor(wx.Dialog):
         if sum(bool(x[0]) for x in buttonSet):
             buttons = vSizer()
             for (flag, defLabel, func) in buttonSet:
-                if not flag: continue
+                if not flag:
+                    continue
                 label = (flag == True and defLabel) or flag
                 buttons.Add(button(self, label, onClick=func), 0,
                     wx.LEFT | wx.TOP, 4)
@@ -826,7 +837,8 @@ class ListEditor(wx.Dialog):
     def DoAction(self, event):
         """Acts on the selected item."""
         selections = self.list.GetSelections()
-        if not selections: return bell()
+        if not selections:
+            return bell()
         itemDex = selections[0]
         item = self.items[itemDex]
         self.data.action(item)
@@ -846,7 +858,8 @@ class ListEditor(wx.Dialog):
     def DoRename(self, event):
         """Renames selected item."""
         selections = self.list.GetSelections()
-        if not selections: return bell()
+        if not selections:
+            return bell()
         # --Rename it
         itemDex = selections[0]
         curName = self.list.GetString(itemDex)
@@ -863,11 +876,13 @@ class ListEditor(wx.Dialog):
     def DoRemove(self, event):
         """Removes selected item."""
         selections = self.list.GetSelections()
-        if not selections: return bell()
+        if not selections:
+            return bell()
         # --Data
         itemDex = selections[0]
         item = self.items[itemDex]
-        if not self.data.remove(item): return
+        if not self.data.remove(item):
+            return
         # --GUI
         del self.items[itemDex]
         self.list.Delete(itemDex)
@@ -888,7 +903,8 @@ class ListEditor(wx.Dialog):
     def OnInfoEdit(self, event):
         """Info box text has been edited."""
         selections = self.list.GetSelections()
-        if not selections: return bell()
+        if not selections:
+            return bell()
         item = self.items[selections[0]]
         if self.gInfoBox.IsModified():
             self.data.setInfo(item, self.gInfoBox.GetValue())
@@ -942,10 +958,10 @@ class Picture(wx.Window):
         """Updates scaled version of bitmap."""
         picWidth, picHeight = self.oldSize = self.GetSizeTuple()
         bitmap = self.scaled = self.bitmap
-        if not bitmap: return
+        if not bitmap:
+            return
         imgWidth, imgHeight = bitmap.GetWidth(), bitmap.GetHeight()
-        if self.scaling == 2 or (self.scaling == 1 and (
-                imgWidth > picWidth or imgHeight > picHeight)):
+        if self.scaling == 2 or (self.scaling == 1 and (imgWidth > picWidth or imgHeight > picHeight)):
             image = bitmap.ConvertToImage()
             factor = min(1.0 * picWidth / imgWidth, 1.0 * picHeight / imgHeight)
             newWidth, newHeight = int(factor * imgWidth), int(
@@ -982,7 +998,8 @@ class Progress(bolt.Progress):
 
     def __init__(self, title=_('Progress'), message=' ' * 60, parent=None,
         style=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME | wx.PD_AUTO_HIDE):
-        if sys.version[:3] != '2.4': style |= wx.PD_SMOOTH
+        if sys.version[:3] != '2.4':
+            style |= wx.PD_SMOOTH
         self.dialog = wx.ProgressDialog(title, message, 100, parent, style)
         bolt.Progress.__init__(self)
         self.message = message
@@ -995,8 +1012,7 @@ class Progress(bolt.Progress):
         if not self.dialog:
             raise StateError(_('Dialog already destroyed.'))
         elif (state == 0 or state == 1 or (message != self.prevMessage) or
-                (state - self.prevState) > 0.05 or (
-            time.time() - self.prevTime) > 0.5):
+                (state - self.prevState) > 0.05 or (time.time() - self.prevTime) > 0.5):
             if message != self.prevMessage:
                 self.dialog.Update(int(state * 100), message)
             else:
@@ -1013,7 +1029,7 @@ class Progress(bolt.Progress):
 
 # ------------------------------------------------------------------------------
 class Tank(wx.Panel):
-    """'Tank' format table. Takes the form of a wxListCtrl in Report mode, with 
+    """'Tank' format table. Takes the form of a wxListCtrl in Report mode, with
     multiple columns and (optionally) column an item menus."""
 
     class ListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
@@ -1032,7 +1048,8 @@ class Tank(wx.Panel):
         details=None, id=-1, style=(wx.LC_REPORT | wx.LC_SINGLE_SEL)):
         wx.Panel.__init__(self, parent, id, style=wx.WANTS_CHARS)
         # --Data
-        if icons == None: icons = {}
+        if icons == None:
+            icons = {}
         self.data = data
         self.icons = icons  # --Default to balt image collection.
         self.mainMenu = mainMenu or self.__class__.mainMenu
@@ -1088,7 +1105,8 @@ class Tank(wx.Panel):
     def GetId(self, item):
         """Returns id for specified item, creating id if necessary."""
         id = self.item_itemId.get(item)
-        if id: return id
+        if id:
+            return id
         # --Else get a new item id.
         id = self.nextItemId
         self.nextItemId += 1
@@ -1125,14 +1143,16 @@ class Tank(wx.Panel):
 
     def UpdateItem(self, index, item=None, selected=tuple()):
         """Populate Item for specified item."""
-        if index < 0: return
+        if index < 0:
+            return
         data, gList = self.data, self.gList
         item = item or self.GetItem(index)
         for iColumn, column in enumerate(data.getColumns(item)):
             gList.SetStringItem(index, iColumn, column)
         gItem = gList.GetItem(index)
         iconKey, textKey, backKey = data.getGuiKeys(item)
-        if iconKey and self.icons: gItem.SetImage(self.icons[iconKey])
+        if iconKey and self.icons:
+            gItem.SetImage(self.icons[iconKey])
         if textKey:
             gItem.SetTextColour(colors[textKey])
         else:
@@ -1151,7 +1171,8 @@ class Tank(wx.Panel):
         items = set(self.data.keys())
         index = 0
         # --Items to select afterwards. (Defaults to current selection.)
-        if selected == 'SAME': selected = set(self.GetSelected())
+        if selected == 'SAME':
+            selected = set(self.GetSelected())
         # --Update existing items.
         while index < gList.GetItemCount():
             item = self.GetItem(index)
@@ -1174,7 +1195,7 @@ class Tank(wx.Panel):
     def SortItems(self, column=None, reverse='CURRENT'):
         """Sort items. Real work is done by data object, and that completed
         sort is then "cloned" list through an intermediate cmp function.
-        
+
         column: column to sort. Defaults to current sort column.
 
         reverse:
@@ -1211,7 +1232,8 @@ class Tank(wx.Panel):
     def RefreshReport(self):
         """(Optionally) Shows a report of changes after a data refresh."""
         report = self.data.getRefreshReport()
-        if report: showInfo(self, report, self.data.title)
+        if report:
+            showInfo(self, report, self.data.title)
 
     def RefreshUI(self, items='ALL', details='SAME'):
         """Refreshes UI for specified file."""
@@ -1233,14 +1255,17 @@ class Tank(wx.Panel):
     # --Details view (if it exists)
     def GetDetailsItem(self):
         """Returns item currently being shown in details view."""
-        if self.details: return self.details.GetDetailsItem()
+        if self.details:
+            return self.details.GetDetailsItem()
         return None
 
     def RefreshDetails(self, item=None):
         """Refreshes detail view associated with data from item."""
-        if self.details: return self.details.RefreshDetails(item)
+        if self.details:
+            return self.details.RefreshDetails(item)
         item = item or self.GetDetailsItem()
-        if item not in self.data: item = None
+        if item not in self.data:
+            item = None
 
     # --Selected items
     def GetSelected(self):
@@ -1307,7 +1332,8 @@ class Tank(wx.Panel):
 
     def DoColumnMenu(self, event):
         """Show column menu."""
-        if not self.mainMenu: return
+        if not self.mainMenu:
+            return
         iColumn = event.GetColumn()
         menu = wx.Menu()
         for item in self.mainMenu:
@@ -1317,9 +1343,11 @@ class Tank(wx.Panel):
 
     def DoItemMenu(self, event):
         """Show item menu."""
-        if not self.itemMenu: return
+        if not self.itemMenu:
+            return
         selected = self.GetSelected()
-        if not selected: return
+        if not selected:
+            return
         menu = wx.Menu()
         for item in self.itemMenu:
             item.AppendToMenu(menu, self, selected)
@@ -1330,11 +1358,14 @@ class Tank(wx.Panel):
     def DeleteSelected(self):
         """Deletes selected items."""
         items = self.GetSelected()
-        if not items: return
+        if not items:
+            return
         message = _(r'Delete these items? This operation cannot be undone.')
         message += '\n* ' + '\n* '.join([self.data.getName(x) for x in items])
-        if not askYes(self, message, _('Delete Items')): return
-        for item in items: del self.data[item]
+        if not askYes(self, message, _('Delete Items')):
+            return
+        for item in items:
+            del self.data[item]
         self.RefreshUI()
         self.data.setChanged()
 
@@ -1393,7 +1424,8 @@ class Link:
             self.window = window
             self.data = data
         # --Generate self.id if necessary (i.e. usually)
-        if not self.id: self.id = wx.NewId()
+        if not self.id:
+            self.id = wx.NewId()
         wx.EVT_MENU(window, self.id, self.Execute)
 
     def Execute(self, event):
@@ -1485,7 +1517,7 @@ class Tank_Open(Link):
 
 # ------------------------------------------------------------------------------
 class Tank_Duplicate(Link):
-    """Create a duplicate of a tank item, assuming that tank item is a file, 
+    """Create a duplicate of a tank item, assuming that tank item is a file,
     and using a SaveAs dialog."""
 
     def AppendToMenu(self, menu, window, data):
@@ -1498,11 +1530,11 @@ class Tank_Duplicate(Link):
         srcDir = self.data.dir
         srcName = self.selected[0]
         (root, ext) = srcName.rootExt
-        (destDir, destName, wildcard) = (
-        srcDir, root + ' Copy' + ext, '*' + ext)
+        (destDir, destName, wildcard) = (srcDir, root + ' Copy' + ext, '*' + ext)
         destPath = askSave(self.gTank, _('Duplicate as:'), destDir, destName,
             wildcard)
-        if not destPath: return
+        if not destPath:
+            return
         destDir, destName = destPath.headTail
         if (destDir == srcDir) and (destName == srcName):
             balt.showError(self.window,
