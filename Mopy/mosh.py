@@ -3624,6 +3624,7 @@ class SaveInfo(FileInfo):
                 break
         # --Done
         ins.close()
+        # TODO: check if this should be here or not
         print self.extras['journal']
         return self.extras['journal']
 

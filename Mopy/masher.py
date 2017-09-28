@@ -3053,8 +3053,7 @@ class UtilsList(List):
 
                 cwd = os.getcwd()
                 os.chdir(os.path.split(u)[0])
-                if u.strip('"').strip("'")[-4:].lower() in (
-                ".bat", ".cmd", ".btm"):
+                if u.strip('"').strip("'")[-4:].lower() in (".bat", ".cmd", ".btm"):
                     arguments = ""
                     argsList = self.data[name][1].split()
                     if len(argsList) > 0:
@@ -3068,8 +3067,7 @@ class UtilsList(List):
                 os.chdir(cwd)
             except Exception, exc:
                 WarningMessage(self, _(
-                    "A problem has occured when opening `%s`.\nYou should edit `utils.dcg` and update the corresponding line.\n\nError shouted by OS:\n%s" % (
-                    u, exc)))
+                    "A problem has occured when opening `%s`.\nYou should edit `utils.dcg` and update the corresponding line.\n\nError shouted by OS:\n%s" % (u, exc)))
                 raise exc
 
     def NewItem(self):
@@ -5965,9 +5963,7 @@ class Mods_LoadList:
             newItem = dialog.GetValue()
             dialog.Destroy()
             if len(newItem) == 0 or len(newItem) > 64:
-                ErrorMessage(self.window,
-                    _(
-                        'Load list name must be between 1 and 64 characters long.'))
+                ErrorMessage(self.window,_('Load list name must be between 1 and 64 characters long.'))
             else:
                 self.data[newItem] = mosh.mwIniFile.loadFiles[:]
                 settings.setChanged('mash.loadLists.data')
