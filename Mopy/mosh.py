@@ -2536,6 +2536,8 @@ class MWIniFile:
                 if line:
                     self.postLoadLines.append(line)
                 break
+            # unicode in Yacoby version
+            # loadFile = unicode(maLoadFile.group(1), 'latin-1')
             loadFile = maLoadFile.group(1)
             loadPath = os.path.join(self.dir, 'Data Files', loadFile)
             loadExt = os.path.splitext(loadPath)[-1].lower()
