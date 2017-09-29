@@ -46,7 +46,8 @@ import struct
 import sys
 
 import bolt
-from bolt import BoltError, LString, GPath, Flags, DataDict, SubProgress
+from bolt import BoltError, LString, GPath, Flags, DataDict, SubProgress, \
+    PickleDict
 
 import mush
 
@@ -487,17 +488,17 @@ class Table:
 
 
 # ------------------------------------------------------------------------------
-class PickleDict(bolt.PickleDict):
+class NewPickleDict(PickleDict):
     """Dictionary saved in a pickle file. Supports older bash pickle file formats."""
 
     def __init__(self, path, oldPath=None, readOnly=False):
         """Initialize."""
-        bolt.PickleDict.__init__(self, path, readOnly)
+        super(NewPickleDict, self).__init__(path, readOnly)
         self.oldPath = oldPath or GPath('')
 
     def exists(self):
         """See if pickle file exists."""
-        return (bolt.PickleDict.exists(self) or self.oldPath.exists())
+        return PickleDict.exists(self) or self.oldPath.exists()
 
     def load(self):
         """Loads vdata and data from file or backup file.
@@ -514,7 +515,7 @@ class PickleDict(bolt.PickleDict):
           1: Data read from file
           2: Data read from backup file
         """
-        result = bolt.PickleDict.load(self)
+        result = PickleDict.load(self)
         if not result and self.oldPath.exists():
             ins = None
             try:
@@ -530,7 +531,7 @@ class PickleDict(bolt.PickleDict):
 
     def save(self):
         """Save to pickle file."""
-        saved = bolt.PickleDict.save(self)
+        saved = PickleDict.save(self)
         if saved:
             self.oldPath.remove()
             self.oldPath.backup.remove()
@@ -4613,7 +4614,7 @@ class InstallersData(bolt.TankData, DataDict):
             {'Order': 'RIGHT', 'Size': 'RIGHT', 'Files': 'RIGHT',
                 'Modified': 'RIGHT'})
         # --Persistent data
-        self.dictFile = PickleDict(self.bashDir.join('Installers.dat'))
+        self.dictFile = NewPickleDict(self.bashDir.join('Installers.dat'))
         self.data = {}
         self.data_sizeCrcDate = {}
         # --Volatile
